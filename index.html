@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tempo – Typing practice for the real world</title>
+<meta name="description" content="Practise typing with your own questions, dictation from audio, and a timed speed test.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232f5bff'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='monospace' font-weight='700'%3Et%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #edf1f5;
+    --surface: #ffffff;
+    --ink: #12203a;
+    --muted: #66758b;
+    --muted-strong: #5b6b82;
+    --line: #d5dde7;
+    --accent: #2f5bff;
+    --accent-ink: #ffffff;
+    --accent-soft: #e4eaff;
+    --bad: #c0213a;
+    --bad-soft: #fde7ea;
+    --ok: #0d6b4c;
+    --ok-soft: #dff4ea;
+    --warn: #8a5000;
+    --warn-soft: #fff0d4;
+    --good: #12203a;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1626;
+      --surface: #16213a;
+      --ink: #e8eef8;
+      --muted: #8497b8;
+      --muted-strong: #8a9bb5;
+      --line: #26354f;
+      --accent: #7b97ff;
+      --accent-ink: #0e1626;
+      --accent-soft: #223158;
+      --bad: #ff6b7f;
+      --bad-soft: #3a1c27;
+      --ok: #4cd6a1;
+      --ok-soft: #123a2f;
+      --warn: #f0b95b;
+      --warn-soft: #3a2d12;
+      --good: #e8eef8;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1626;
+    --surface: #16213a;
+    --ink: #e8eef8;
+    --muted: #8497b8;
+    --muted-strong: #8a9bb5;
+    --line: #26354f;
+    --accent: #7b97ff;
+    --accent-ink: #0e1626;
+    --accent-soft: #223158;
+    --bad: #ff6b7f;
+    --bad-soft: #3a1c27;
+    --ok: #4cd6a1;
+    --ok-soft: #123a2f;
+    --warn: #f0b95b;
+    --warn-soft: #3a2d12;
+    --good: #e8eef8;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font-family: var(--display); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 20px 56px; }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 6px 0 26px; }
+  .brand { font-weight: 800; font-size: 26px; letter-spacing: -0.03em; display: flex; align-items: center; gap: 10px; }
+  .brand-mark { width: 30px; height: 30px; border-radius: 9px; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); font-family: var(--mono); font-weight: 700; font-size: 16px; }
+
+  h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 800; margin: 0 0 8px; }
+  .sub { color: var(--muted-strong); font-size: 18px; margin: 0 0 28px; max-width: 60ch; line-height: 1.45; }
+
+  .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; gap: 2px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; padding: 9px 16px; border-radius: 9px; font-weight: 700; font-size: 15px; color: var(--muted-strong); }
+  .seg button[aria-pressed="true"], .seg button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg button:not([aria-pressed="true"]):not([aria-selected="true"]):hover { background: var(--accent-soft); color: var(--ink); }
+  .seg.small button { padding: 7px 12px; font-size: 14px; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; margin-bottom: 18px; }
+  .toggle { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: var(--muted-strong); cursor: pointer; user-select: none; }
+  .toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; }
+
+  /* ---------- speed test ---------- */
+  .live { display: flex; gap: 32px; padding: 20px 28px 0; align-items: baseline; flex-wrap: wrap; }
+  .stat .v { font-family: var(--mono); font-size: 34px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+  .stat .l { font-size: 13px; color: var(--muted-strong); font-weight: 600; margin-top: 4px; }
+  .stat.time .v { color: var(--accent); }
+  .live .spacer { flex: 1; }
+  .restart { align-self: center; border: 1px solid var(--line); background: transparent; border-radius: 10px; padding: 9px 14px; font-weight: 700; font-size: 14px; color: var(--muted-strong); }
+  .restart:hover { background: var(--accent-soft); color: var(--ink); }
+
+  .stage { position: relative; padding: 18px 28px 28px; }
+  .viewport { position: relative; overflow: hidden; height: calc(var(--lh) * 3); --lh: 56px; font-family: var(--mono); font-size: 26px; line-height: var(--lh); cursor: text; }
+  .words { position: relative; transition: transform 0.12s ease-out; }
+  .w { display: inline-block; margin-right: 0.8ch; white-space: nowrap; }
+  .c { color: var(--muted); border-right: 2px solid transparent; margin-right: -2px; }
+  .c.ok { color: var(--good); }
+  .c.bad { color: var(--bad); background: var(--bad-soft); border-radius: 3px; }
+  .c.miss { color: var(--muted); text-decoration: underline; text-decoration-color: var(--bad); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+  .c.cur { border-left: 2px solid var(--accent); margin-left: -2px; }
+  .c.cur-after { border-right: 2px solid var(--accent); margin-right: -2px; }
+  .running .c.cur, .running .c.cur-after { animation: none; }
+  .idle .c.cur { animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { border-left-color: transparent; } }
+  .veil { position: absolute; inset: 0; display: none; place-items: center; text-align: center; background: color-mix(in srgb, var(--surface) 78%, transparent); backdrop-filter: blur(3px); font-weight: 700; font-size: 18px; color: var(--ink); cursor: pointer; border-radius: 0 0 18px 18px; }
+  .stage.blurred .veil { display: grid; }
+  .progress { height: 4px; background: var(--line); overflow: hidden; margin: 0 28px; border-radius: 4px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s linear; }
+  .hint { margin: 14px 4px 0; color: var(--muted-strong); font-size: 14px; }
+  kbd { font-family: var(--mono); font-size: 12px; background: var(--surface); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
+
+  .results { display: none; padding: 28px; }
+  .done .results { display: block; }
+  .done .stage, .done .live, .done .progress { display: none; }
+  .res-top { display: flex; flex-wrap: wrap; gap: 28px 56px; align-items: flex-end; margin-bottom: 24px; }
+  .big .v { font-family: var(--mono); font-weight: 700; font-size: clamp(64px, 12vw, 104px); line-height: 0.95; letter-spacing: -0.05em; color: var(--accent); }
+  .big .l { font-size: 15px; color: var(--muted-strong); font-weight: 600; margin-top: 6px; }
+  .medium .v { font-family: var(--mono); font-weight: 700; font-size: 40px; line-height: 1; letter-spacing: -0.03em; }
+  .medium .l { font-size: 14px; color: var(--muted-strong); font-weight: 600; margin-top: 6px; }
+  .badge { display: inline-block; background: var(--accent-soft); color: var(--ink); font-weight: 700; font-size: 14px; padding: 7px 12px; border-radius: 999px; margin-bottom: 18px; }
+  .badge.pb { background: var(--accent); color: var(--accent-ink); }
+  .chart { width: 100%; height: auto; display: block; margin: 8px 0 22px; overflow: visible; }
+  .chart .grid { stroke: var(--line); stroke-width: 1; }
+  .chart .axis { fill: var(--muted-strong); font-family: var(--mono); font-size: 11px; }
+  .chart .line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .area { fill: var(--accent); opacity: 0.12; }
+  .res-actions, .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn { border: 0; border-radius: 12px; padding: 13px 22px; font-weight: 700; font-size: 16px; background: var(--accent); color: var(--accent-ink); }
+  .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+  .btn.small { padding: 8px 14px; font-size: 14px; border-radius: 10px; }
+  .btn:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .bests { margin-top: 36px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .panel { padding: 22px 24px; }
+  .panel h2 { margin: 0 0 14px; font-size: 19px; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 10px; }
+  .panel h2 .count { font-family: var(--mono); font-size: 14px; color: var(--muted-strong); font-weight: 500; }
+  .best-row { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid var(--line); font-weight: 600; color: var(--muted-strong); }
+  .best-row:first-of-type { border-top: 0; }
+  .best-row b { font-family: var(--mono); color: var(--ink); }
+  .recent { margin: 0; padding: 0; list-style: none; }
+  .recent li { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid var(--line); color: var(--muted-strong); font-weight: 600; font-size: 15px; }
+  .recent li:first-child { border-top: 0; }
+  .recent b { font-family: var(--mono); color: var(--ink); }
+  .empty { color: var(--muted-strong); font-size: 15px; line-height: 1.45; margin: 0; }
+  .hidden-input { position: fixed; opacity: 0; pointer-events: none; left: -9999px; top: 0; width: 1px; height: 1px; }
+
+  /* ---------- forms & lists (reviewer, dictation) ---------- */
+  .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 16px; align-items: start; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field label, .opt label { font-weight: 600; font-size: 14px; color: var(--muted-strong); }
+  input[type="text"], textarea.txt, select {
+    font-family: var(--display); font-size: 16px; padding: 11px 12px; width: 100%;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink);
+  }
+  textarea.txt { resize: vertical; line-height: 1.4; }
+  details.bulk { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
+  details.bulk summary { font-weight: 700; cursor: pointer; margin-bottom: 6px; padding: 13px 0; }
+  details.bulk textarea { margin: 10px 0; }
+  .status { min-height: 20px; margin: 12px 0 0; font-size: 14px; font-weight: 600; color: var(--muted-strong); }
+  .deck { list-style: none; margin: 0 0 16px; padding: 0; max-height: 330px; overflow-y: auto; }
+  .deck li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); }
+  .deck li:first-child { border-top: 0; }
+  .deck .item-main { min-width: 0; flex: 1; }
+  .deck .q { font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+  .deck .a { color: var(--muted-strong); font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
+  .item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .icon-btn { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: transparent; font-size: 18px; line-height: 1; color: var(--muted-strong); }
+  .icon-btn:hover { background: var(--bad-soft); color: var(--bad); }
+  .opts { display: grid; gap: 12px; margin: 4px 0 18px; }
+  .opts .opt { display: flex; flex-direction: column; gap: 6px; }
+  .opts input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .opts .inline { flex-direction: row; align-items: center; gap: 10px; }
+  .rec-box { margin: 0 0 16px; padding: 14px; border: 1px dashed var(--line); border-radius: 12px; display: grid; gap: 12px; }
+  .rec-box audio { width: 100%; }
+  .rec-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .rec-on { background: var(--bad) !important; color: #fff !important; border-color: var(--bad) !important; }
+  .file-btn { display: inline-flex; align-items: center; cursor: pointer; }
+
+  /* ---------- session runner ---------- */
+  .run, .sum { padding: 24px 28px 28px; }
+  .run-head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .run-count { font-weight: 700; font-size: 15px; color: var(--muted-strong); white-space: nowrap; }
+  .run-bar { flex: 1; height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .run-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s ease; }
+  .run-prompt { min-height: 84px; margin-bottom: 18px; }
+  .run-q { font-size: clamp(24px, 4vw, 34px); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+  textarea.answer {
+    width: 100%; min-height: 120px; resize: none; padding: 16px 18px;
+    font-family: var(--mono); font-size: 21px; line-height: 1.5; color: var(--ink);
+    background: var(--bg); border: 2px solid var(--line); border-radius: 14px; caret-color: var(--accent);
+  }
+  textarea.answer:focus { outline: none; border-color: var(--accent); }
+  textarea.answer[readonly] { border-color: var(--line); opacity: 0.8; }
+  .run-hint { margin-top: 12px; font-size: 14px; color: var(--muted-strong); min-height: 20px; }
+  .run-hint.warn { color: var(--bad); font-weight: 600; }
+
+  .feedback { margin-top: 18px; padding: 18px 20px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg); }
+  .fb-top { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 14px; }
+  .chip { display: inline-block; padding: 6px 12px; border-radius: 999px; font-weight: 800; font-size: 14px; }
+  .chip.correct { background: var(--ok-soft); color: var(--ok); }
+  .chip.close { background: var(--warn-soft); color: var(--warn); }
+  .chip.wrong { background: var(--bad-soft); color: var(--bad); }
+  .fb-stats { font-family: var(--mono); font-size: 14px; color: var(--muted-strong); }
+  .fb-line { margin-top: 10px; }
+  .fb-line .fb-l { font-size: 13px; font-weight: 700; color: var(--muted-strong); }
+  .fb-line p { margin: 3px 0 0; font-family: var(--mono); font-size: 17px; line-height: 1.55; overflow-wrap: anywhere; }
+  .dx-bad { background: var(--bad-soft); color: var(--bad); text-decoration: line-through; border-radius: 3px; padding: 0 3px; }
+  .dx-miss { background: var(--accent-soft); border-bottom: 2px solid var(--accent); border-radius: 3px; padding: 0 3px; }
+  .fb-nums { display: flex; flex-wrap: wrap; gap: 14px 36px; }
+  .fb-nums .medium .v { font-size: 28px; }
+  .sl-ans { white-space: pre-wrap; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+  .sum-sub { margin: 8px 0 0; font-size: 18px; letter-spacing: -0.01em; }
+
+  .sum h2 { margin: 0 0 18px; font-size: 24px; letter-spacing: -0.02em; }
+  .sum-list { list-style: none; padding: 0; margin: 22px 0; }
+  .sum-list li { padding: 14px 0; border-top: 1px solid var(--line); display: grid; gap: 4px; }
+  .sum-list li:first-child { border-top: 0; }
+  .sum-list .sl-q { font-weight: 700; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .sum-list .sl-t { font-family: var(--mono); font-size: 15px; color: var(--muted-strong); overflow-wrap: anywhere; }
+  .sum-list .sl-t b { color: var(--ink); font-weight: 500; }
+
+  .dict { display: flex; gap: 18px; align-items: center; }
+  .play { position: relative; width: 68px; height: 68px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; flex-shrink: 0; }
+  .play:disabled { opacity: 0.4; cursor: not-allowed; }
+  .play svg { width: 30px; height: 30px; }
+  .play.playing::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--accent); opacity: 0.4; animation: pulse 1.1s ease-out infinite; }
+  @keyframes pulse { from { transform: scale(0.9); opacity: 0.6; } to { transform: scale(1.25); opacity: 0; } }
+  .dict-title { font-size: clamp(20px, 3.4vw, 26px); font-weight: 700; letter-spacing: -0.02em; }
+  .dict-meta { margin-top: 4px; font-size: 14px; color: var(--muted-strong); }
+
+  ::placeholder { color: var(--muted-strong); opacity: 1; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .skip { position: absolute; left: 12px; top: -80px; z-index: 10; background: var(--accent); color: var(--accent-ink); padding: 10px 16px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+  .skip:focus { top: calc(env(safe-area-inset-top, 0px) + 12px); }
+  .mt { margin-top: 16px; }
+  main { display: block; }
+  .seg button, .btn.small, .restart { min-height: 44px; }
+  .icon-btn { width: 44px; height: 44px; }
+  textarea.answer:focus { box-shadow: 0 0 0 4px var(--accent-soft); }
+
+  .tier { display: flex; gap: 18px; align-items: center; padding: 16px 20px; margin: 6px 0 18px; background: var(--accent-soft); color: var(--ink); border-radius: 16px; }
+  .tier-icon { font-size: 64px; line-height: 1; background: none; border: 0; cursor: pointer; padding: 4px 8px; animation: hop 1.8s ease-in-out infinite; }
+  .tier-icon.pop { animation: pop 0.6s ease; }
+  .tier-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .tier-line { margin-top: 2px; }
+  .tier-bar { height: 8px; background: var(--surface); border-radius: 8px; overflow: hidden; margin: 10px 0 6px; min-width: 160px; }
+  .tier-bar i { display: block; height: 100%; background: var(--accent); }
+  .tier-next { font-size: 14px; font-weight: 600; }
+  @keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes pop { 0% { transform: scale(1) rotate(0); } 40% { transform: scale(1.35) rotate(-12deg); } 100% { transform: scale(1) rotate(0); } }
+  @media (prefers-reduced-motion: reduce) { .tier-icon { animation: none !important; } }
+  .foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted-strong); font-size: 14px; line-height: 1.5; max-width: 70ch; }
+  .foot p { margin: 0 0 12px; }
+  @media print {
+    body { background: #fff; color: #000; }
+    header.top, .foot, .skip, .sub, .controls, .res-actions, .run-head, textarea, .hint, .bests, #rvSetup, #dcSetup, #rvHistoryCard, #dcHistoryCard { display: none !important; }
+    .card { border: 0; }
+    .sum { padding: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 14px 14px 40px; }
+    .viewport { --lh: 46px; font-size: 20px; }
+    .live { padding: 16px 18px 0; gap: 22px; }
+    .stage { padding: 14px 18px 22px; }
+    .progress { margin: 0 18px; }
+    .results, .run, .sum { padding: 20px; }
+    textarea.answer { font-size: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .words, .progress i, .run-bar i { transition: none; }
+    .idle .c.cur { animation: none; }
+    .play.playing::after { animation: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="brand-mark">t</span>Tempo</div>
+    <div class="seg" role="tablist" aria-label="Practice mode" id="tabs">
+      <button type="button" role="tab" id="tab-review" aria-controls="panel-review" data-tab="review" aria-selected="true" tabindex="0">Reviewer</button>
+      <button type="button" role="tab" id="tab-dictation" aria-controls="panel-dictation" data-tab="dictation" aria-selected="false" tabindex="-1">Dictation</button>
+      <button type="button" role="tab" id="tab-speed" aria-controls="panel-speed" data-tab="speed" aria-selected="false" tabindex="-1">Speed test</button>
+    </div>
+    <button type="button" class="restart" id="themeBtn">Dark mode</button>
+  </header>
+
+  <!-- ================= REVIEWER ================= -->
+  <main id="main">
+  <section id="panel-review" role="tabpanel" aria-labelledby="tab-review">
+    <h1>Review by typing.</h1>
+    <p class="sub">Write your own questions, then type your answers. There's no answer key: you get your typing results and a record of everything you wrote. Pasting is off, so it feels like typing on the job.</p>
+
+    <div id="rvSetup">
+      <div class="two-col">
+        <div class="card panel">
+          <h2>Add a question</h2>
+          <div class="field"><label for="rvQ">Question</label><input type="text" id="rvQ" autocomplete="off" placeholder="Describe your ideal weekend."></div>
+          <div class="field"><label for="rvCat">Category for this question</label><select id="rvCat"></select></div>
+          <div class="row">
+            <button type="button" class="btn" id="rvAdd">Add question</button>
+            
+          </div>
+          <div class="field mt"><label for="rvSampleCat">Sample questions</label><div class="row"><select id="rvSampleCat" style="flex:1;min-width:180px"></select><button type="button" class="btn ghost" id="rvSample">Add samples</button></div></div>
+          <details class="bulk">
+            <summary>Paste many at once</summary>
+            <p class="empty">One question per line.</p>
+            <textarea class="txt" id="rvBulk" aria-label="Questions, one per line" rows="5" placeholder="Why do you want this job?&#10;Describe a problem you solved recently."></textarea>
+            <button type="button" class="btn ghost" id="rvImport">Add questions</button>
+          </details>
+          <p class="status" id="rvStatus" role="status"></p>
+        </div>
+
+        <div class="card panel">
+          <h2>Your questions <span class="count" id="rvCount"></span></h2>
+          <ul class="deck" id="rvList"></ul>
+          <div class="opts">
+            <div class="opt"><label for="rvFilter">Practise</label><select id="rvFilter"></select></div>
+            <div class="opt"><label for="rvNum">Random sample questions per test (your own are always all included)</label><select id="rvNum"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="0">All of them</option></select></div>
+          </div>
+          <div class="row">
+            <button type="button" class="btn" id="rvStart">Start typing review</button>
+            <button type="button" class="btn ghost" id="rvClear">Clear all</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card panel mt" id="rvHistoryCard">
+      <h2>Recent sessions <span class="count" id="rvBest"></span></h2>
+      <ul class="recent" id="rvHistory"></ul>
+    </div>
+    <div class="card" id="rvRunner" hidden></div>
+  </section>
+
+  <!-- ================= DICTATION ================= -->
+  <section id="panel-dictation" role="tabpanel" aria-labelledby="tab-dictation" hidden>
+    <h1>Type what you hear.</h1>
+    <p class="sub">A voice reads a sentence and you type it. Use the built-in computer voice, or record your own voice and type that.</p>
+
+    <div id="dcSetup">
+      <div class="two-col">
+        <div class="card panel">
+          <h2>Add a passage</h2>
+          <div class="field"><label for="dcText">What the audio says</label>
+            <textarea class="txt" id="dcText" rows="4" placeholder="Type the words that will be spoken. This is also the answer key."></textarea>
+          </div>
+          <div class="field"><label id="dcSrcLbl">Audio</label>
+            <div class="seg small" id="dcSource" role="group" aria-labelledby="dcSrcLbl">
+              <button type="button" data-src="tts" aria-pressed="true">Computer voice</button>
+              <button type="button" data-src="rec" aria-pressed="false">My recording</button>
+            </div>
+          </div>
+          <div class="rec-box" id="dcRec" hidden>
+            <div class="rec-row">
+              <button type="button" class="btn ghost small" id="dcRecBtn">Record</button>
+              <label class="btn ghost small file-btn">Upload audio file<input type="file" id="dcFile" accept="audio/*" hidden></label>
+              <span class="empty" id="dcRecNote">Read the passage aloud, then stop.</span>
+            </div>
+            <audio id="dcPreview" controls hidden></audio>
+          </div>
+          <div class="row">
+            <button type="button" class="btn" id="dcAdd">Add passage</button>
+            <button type="button" class="btn ghost" id="dcSample">Load sample passages</button>
+          </div>
+          <p class="status" id="dcStatus" role="status"></p>
+        </div>
+
+        <div class="card panel">
+          <h2>Passages <span class="count" id="dcCount"></span></h2>
+          <ul class="deck" id="dcList"></ul>
+          <div class="opts">
+            <div class="opt"><label for="dcVoice">Voice</label><select id="dcVoice"><option value="">Default voice</option></select></div>
+            <div class="opt"><label for="dcSpeed">Speaking speed: <span id="dcSpeedV">0.95×</span></label><input type="range" id="dcSpeed" min="0.6" max="1.3" step="0.05" value="0.95"></div>
+            <div class="opt"><label for="dcReplays">Replays</label>
+              <select id="dcReplays">
+                <option value="inf">Unlimited</option>
+                <option value="2">Up to 2 replays</option>
+                <option value="0">Play once</option>
+              </select>
+            </div>
+            <div class="opt"><label for="dcStrict">Checking</label>
+              <select id="dcStrict">
+                <option value="lenient">Ignore capitals and punctuation</option>
+                <option value="strict">Exact (capitals and punctuation count)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card panel mt" id="dcHistoryCard">
+      <h2>Recent sessions <span class="count" id="dcBest"></span></h2>
+      <ul class="recent" id="dcHistory"></ul>
+    </div>
+    <div class="card" id="dcRunner" hidden></div>
+  </section>
+
+  <!-- ================= SPEED TEST ================= -->
+  <section id="panel-speed" role="tabpanel" aria-labelledby="tab-speed" hidden>
+    <h1>How fast do you type?</h1>
+    <p class="sub">Pick a length, then type the words below. Your timer begins with your first keystroke.</p>
+
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Test length" id="durations">
+        <button type="button" data-dur="60" aria-pressed="true">1 minute</button>
+        <button type="button" data-dur="180" aria-pressed="false">3 minutes</button>
+        <button type="button" data-dur="300" aria-pressed="false">5 minutes</button>
+        <button type="button" data-dur="600" aria-pressed="false">10 minutes</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="punct" checked> Real sentences (turn off for random words)</label>
+    </div>
+
+    <div class="card" id="app">
+      <div class="live">
+        <div class="stat time"><div class="v" id="timeV">1:00</div><div class="l">Time left</div></div>
+        <div class="stat"><div class="v" id="wpmV">0</div><div class="l">Words per minute</div></div>
+        <div class="stat"><div class="v" id="accV">100%</div><div class="l">Accuracy</div></div>
+        <div class="spacer"></div>
+        <button type="button" class="restart" id="restartBtn">Restart</button>
+      </div>
+      <div class="stage idle" id="stage">
+        <div class="viewport" id="viewport"><div class="words" id="words"></div></div>
+        <div class="veil" id="veil">Click here to keep typing</div>
+      </div>
+      <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+      <section class="results" id="results" aria-live="polite">
+        <div class="badge" id="badge"></div>
+        <div class="res-top">
+          <div class="big"><div class="v" id="rWpm">0</div><div class="l">Words per minute</div></div>
+          <div class="medium"><div class="v" id="rAcc">0%</div><div class="l">Accuracy</div></div>
+          <div class="medium"><div class="v" id="rRaw">0</div><div class="l">Raw speed (WPM)</div></div>
+          <div class="medium"><div class="v" id="rChars">0/0</div><div class="l">Correct / total characters</div></div>
+        </div>
+        <div id="rTier"></div>
+        <svg class="chart" id="chart" viewBox="0 0 700 190" role="img" aria-label="Words per minute over time"></svg>
+        <div class="res-actions">
+          <button type="button" class="btn" id="againBtn">Try again</button>
+          <button type="button" class="btn ghost" id="newBtn">New words</button>
+        </div>
+      </section>
+    </div>
+    <p class="hint" id="hint">Start typing to begin. Press <kbd>Esc</kbd> to restart, <kbd>Space</kbd> to move to the next word.</p>
+
+    <section class="bests">
+      <div class="card panel"><h2>Your best scores</h2><div id="bestList"></div></div>
+      <div class="card panel"><h2>Recent tests</h2><ul class="recent" id="recentList"></ul></div>
+    </section>
+  </section>
+  </main>
+  <footer class="foot">
+    <p><b>Privacy:</b> Tempo runs entirely in your browser. Your questions, scores, and recordings stay on your device and are never uploaded. Clearing your browser data erases them.</p>
+    <button type="button" class="restart" id="wipeBtn">Clear my saved data</button> <span id="wipeNote" role="status"></span>
+  </footer>
+</div>
+
+<input class="hidden-input" id="input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type here">
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var activeTab = "review";
+
+  /* ================= shared helpers ================= */
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function loadList(key) {
+    try { var raw = localStorage.getItem(key); if (raw) { var v = JSON.parse(raw); if (Array.isArray(v)) return v; } } catch (e) {}
+    return [];
+  }
+  function saveList(key, arr) { try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {} }
+
+  function norm(s, strict) {
+    s = String(s).replace(/\s+/g, " ").trim();
+    if (!strict) s = s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").replace(/\s+/g, " ").trim();
+    return s;
+  }
+  function lev(a, b) {
+    var m = a.length, n = b.length, i, j;
+    if (!m) return n; if (!n) return m;
+    var prev = new Array(n + 1), cur = new Array(n + 1);
+    for (j = 0; j <= n; j++) prev[j] = j;
+    for (i = 1; i <= m; i++) {
+      cur[0] = i;
+      for (j = 1; j <= n; j++) {
+        var c = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + c);
+      }
+      var t = prev; prev = cur; cur = t;
+    }
+    return prev[n];
+  }
+  function gradeAnswer(typed, answer, strict) {
+    var a = norm(answer, strict), t = norm(typed, strict);
+    var mx = Math.max(a.length, t.length);
+    var sim = mx === 0 ? 1 : 1 - lev(a, t) / mx;
+    var g = a === t ? "correct" : (sim >= 0.8 ? "close" : "wrong");
+    return { grade: g, sim: Math.round(sim * 100) };
+  }
+  function diffWords(typed, answer, strict) {
+    var tw = typed.trim().split(/\s+/).filter(Boolean), aw = answer.trim().split(/\s+/).filter(Boolean);
+    var tn = tw.map(function (w) { return norm(w, strict); }), an = aw.map(function (w) { return norm(w, strict); });
+    var m = tw.length, n = aw.length, i, j, dp = [];
+    for (i = 0; i <= m; i++) dp.push(new Array(n + 1).fill(0));
+    for (i = m - 1; i >= 0; i--) for (j = n - 1; j >= 0; j--)
+      dp[i][j] = tn[i] === an[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    var tOk = new Array(m).fill(false), aOk = new Array(n).fill(false);
+    i = 0; j = 0;
+    while (i < m && j < n) {
+      if (tn[i] === an[j]) { tOk[i] = true; aOk[j] = true; i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++;
+    }
+    return {
+      t: tw.map(function (w, k) { return tOk[k] ? escHtml(w) : '<span class="dx-bad">' + escHtml(w) + "</span>"; }).join(" "),
+      a: aw.map(function (w, k) { return aOk[k] ? escHtml(w) : '<span class="dx-miss">' + escHtml(w) + "</span>"; }).join(" ")
+    };
+  }
+  var TIERS = [
+    { min: 0, icon: "🐌", name: "Cozy Snail", line: "Slow and steady. Every fast typist started here." },
+    { min: 20, icon: "🦔", name: "Curious Hedgehog", line: "You are warming up. Keep your eyes on the words." },
+    { min: 30, icon: "🐇", name: "Bouncy Rabbit", line: "Nice rhythm. Speed grows with accuracy." },
+    { min: 40, icon: "🐆", name: "Cheetah", line: "Fast and focused. That is a strong pace." },
+    { min: 55, icon: "🦅", name: "Eagle", line: "Sharp and quick. Professional-level speed." },
+    { min: 70, icon: "🐉", name: "Dragon", line: "Blazing. Very few people type this fast." }
+  ];
+  function tierHtml(wpm) {
+    var i = 0;
+    TIERS.forEach(function (t, k) { if (wpm >= t.min) i = k; });
+    var t = TIERS[i], nx = TIERS[i + 1];
+    var pct = nx ? Math.round((wpm - t.min) / (nx.min - t.min) * 100) : 100;
+    return '<div class="tier"><button type="button" class="tier-icon" aria-label="Cheer for the ' + t.name + '">' + t.icon + '</button>' +
+      '<div><div class="tier-name">' + t.name + '</div><div class="tier-line">' + t.line + '</div>' +
+      '<div class="tier-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="tier-next">' + (nx ? (nx.min - wpm) + ' more WPM to become a ' + nx.name : 'Top tier reached') + '</div></div></div>';
+  }
+  var GRADE_LABEL = { correct: "Correct", close: "Almost there", wrong: "Not quite" };
+
+  /* ================= session runner (type-the-answer flow) ================= */
+  function Runner(root, cfg) {
+    root.innerHTML =
+      '<div class="run" hidden>' +
+        '<div class="run-head"><span class="run-count"></span><div class="run-bar"><i></i></div>' +
+        '<button type="button" class="restart run-quit">End session</button></div>' +
+        '<div class="run-prompt"></div>' +
+        '<textarea class="answer" rows="3" placeholder="Type your answer" aria-label="Your answer" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea>' +
+        '<div class="feedback" hidden></div>' +
+        '<div class="sr-only" role="status" aria-live="polite"></div>' +
+        '<div class="run-hint"></div>' +
+      "</div>" +
+      '<div class="sum" hidden></div>';
+    var run = root.querySelector(".run"), sum = root.querySelector(".sum");
+    var ta = run.querySelector("textarea"), fb = run.querySelector(".feedback"), hint = run.querySelector(".run-hint"), sr = run.querySelector(".sr-only");
+    var items = [], idx = 0, results = [], phase = "answer", tFirst = 0, ins = 0, del = 0, submittedAt = 0, hintTimer = null;
+    var R = {}, fixedKeys = {};
+
+    var HINT_ANSWER = (cfg.graded === false ? "Press <kbd>Enter</kbd> to save your answer and go to the next question." : "Press <kbd>Enter</kbd> to submit.") + " Pasting is turned off." + (cfg.tabHint ? " " + cfg.tabHint : "");
+    function setHint(html, warn) { hint.innerHTML = html; hint.className = "run-hint" + (warn ? " warn" : ""); }
+
+    R.focus = function () { try { ta.focus({ preventScroll: true }); } catch (e) { ta.focus(); } };
+    R.start = function (list) {
+      items = list; idx = 0; results = []; fixedKeys = {};
+      root.hidden = false; sum.hidden = true; run.hidden = false;
+      step();
+    };
+    R.exit = function () {
+      root.hidden = true; run.hidden = true; sum.hidden = true;
+      if (cfg.onExit) cfg.onExit();
+    };
+
+    function step() {
+      phase = "answer"; tFirst = 0; ins = 0; del = 0;
+      var item = items[idx];
+      run.querySelector(".run-count").textContent = cfg.noun + " " + (idx + 1) + " of " + items.length;
+      run.querySelector(".run-bar i").style.width = (idx / items.length * 100) + "%";
+      ta.value = ""; ta.readOnly = false; fb.hidden = true; fb.innerHTML = "";
+      setHint(HINT_ANSWER, false);
+      cfg.renderPrompt(item, run.querySelector(".run-prompt"), idx);
+      R.focus();
+    }
+
+    function submit() {
+      var typed = ta.value.trim();
+      if (!typed) return;
+      var item = items[idx];
+      var ms = tFirst ? Math.max(performance.now() - tFirst, 1000) : 1000;
+      var graded = cfg.graded !== false;
+      var g = graded ? gradeAnswer(typed, item.answer, cfg.strict()) : { grade: "", sim: 0 };
+      var wpm = Math.round((typed.length / 5) / (ms / 60000));
+      var acc = ins ? Math.max(0, Math.round((1 - del / ins) * 100)) : 100;
+      var r = { item: item, typed: typed, grade: g.grade, sim: g.sim, wpm: wpm, acc: acc, ms: ms, chars: typed.length, ins: ins, del: del };
+      results.push(r);
+      if (!graded) {
+        sr.textContent = "Answer saved.";
+        idx++;
+        if (idx >= items.length) finish(); else step();
+        return;
+      }
+      phase = "feedback"; submittedAt = performance.now();
+      ta.readOnly = true;
+      if (cfg.onSubmit) cfg.onSubmit(item);
+      var d = diffWords(typed, item.answer, cfg.strict());
+      fb.hidden = false;
+      fb.innerHTML =
+        '<div class="fb-top"><span class="chip ' + r.grade + '">' + GRADE_LABEL[r.grade] + "</span>" +
+        '<span class="fb-stats">' + wpm + " WPM, " + r.sim + "% match, " + del + (del === 1 ? " correction" : " corrections") + "</span></div>" +
+        '<div class="fb-line"><span class="fb-l">You typed</span><p>' + d.t + "</p></div>" +
+        '<div class="fb-line"><span class="fb-l">Answer</span><p>' + d.a + "</p></div>";
+      sr.textContent = GRADE_LABEL[r.grade] + ". " + wpm + " words per minute, " + r.sim + " percent match.";
+      var last = idx === items.length - 1;
+      setHint("Press <kbd>Enter</kbd> to " + (last ? "see your results" : "continue") + "." + (cfg.tabHint ? " " + cfg.tabHint : ""), false);
+    }
+
+    function next() {
+      if (performance.now() - submittedAt < 350) return;
+      idx++;
+      if (idx >= items.length) finish(); else step();
+    }
+
+    function weakHtml() {
+      var k = Object.keys(fixedKeys).sort(function (a, b) { return fixedKeys[b] - fixedKeys[a]; }).slice(0, 5);
+      return '<p class="empty"><b>Keys you corrected most:</b> ' + (k.length ? k.map(function (x) { return "<kbd>" + escHtml(x) + "</kbd> " + fixedKeys[x]; }).join(", ") : "none, a clean run") + ".</p>";
+    }
+    function csv() {
+      var q = function (s) { return '"' + String(s).replace(/"/g, '""') + '"'; };
+      return ["prompt,typed,wpm,accuracy_pct,corrections,seconds,result"].concat(results.map(function (r) {
+        return [q(cfg.label(r.item)), q(r.typed), r.wpm, r.acc, r.del, Math.round(r.ms / 100) / 10, r.grade || ""].join(",");
+      })).join("\n");
+    }
+    function copyCsv(btn) {
+      var text = csv();
+      var fallback = function () {
+        var t = document.createElement("textarea");
+        t.className = "txt"; t.readOnly = true; t.value = text; t.style.marginTop = "12px"; t.setAttribute("aria-label", "Results as CSV");
+        btn.parentNode.insertAdjacentElement("afterend", t); t.focus(); t.select();
+        btn.textContent = "Select and copy below";
+      };
+      try { navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copied"; }, fallback); } catch (e) { fallback(); }
+    }
+    function finishUngraded() {
+      var chars = 0, ms = 0, ins = 0, del = 0, words = 0;
+      results.forEach(function (r) {
+        chars += r.chars; ms += r.ms; ins += r.ins; del += r.del;
+        words += r.typed.split(/\s+/).filter(Boolean).length;
+      });
+      var wpm = ms ? Math.round((chars / 5) / (ms / 60000)) : 0;
+      var acc = ins ? Math.max(0, Math.round((1 - del / ins) * 100)) : 100;
+      var secs = Math.round(ms / 1000);
+      var time = Math.floor(secs / 60) + ":" + String(secs % 60).padStart(2, "0");
+      var rows = results.map(function (r) {
+        return '<li><div class="sl-q"><span>' + escHtml(cfg.label(r.item)) + "</span></div>" +
+          '<div class="sl-ans">' + escHtml(r.typed) + "</div>" +
+          '<div class="sl-t">' + r.wpm + " WPM, " + r.acc + "% accuracy, " + r.chars + " characters</div></li>";
+      }).join("");
+      sum.innerHTML =
+        "<h2>Your typing results</h2>" +
+        '<div class="res-top">' +
+          '<div class="big"><div class="v">' + wpm + '</div><div class="l">Words per minute</div></div>' +
+          '<div class="medium"><div class="v">' + acc + '%</div><div class="l">Accuracy</div></div>' +
+          '<div class="medium"><div class="v">' + words + '</div><div class="l">Words typed</div></div>' +
+          '<div class="medium"><div class="v">' + time + '</div><div class="l">Time typing</div></div>' +
+        "</div>" +
+        tierHtml(wpm) +
+        '<p class="empty">Accuracy is the share of your keystrokes that you did not have to correct. Time counts from your first keystroke to pressing Enter on each answer.</p>' +
+        weakHtml() +
+        '<h3 class="sum-sub">Your answers</h3>' +
+        '<ul class="sum-list">' + rows + "</ul>" +
+        '<div class="res-actions">' +
+          '<button type="button" class="btn" data-act="again">Practise again</button>' +
+          '<button type="button" class="btn ghost" data-act="copy">Copy results (CSV)</button>' +
+          '<button type="button" class="btn ghost" data-act="exit">Back to setup</button>' +
+        "</div>";
+      if (cfg.onComplete) cfg.onComplete({ wpm: wpm, acc: acc, words: words, count: results.length, when: Date.now() });
+      sum._missed = [];
+      var firstBtn = sum.querySelector(".btn");
+      if (firstBtn) firstBtn.focus();
+    }
+
+    function finish() {
+      run.hidden = true; sum.hidden = false;
+      if (cfg.onFinish) cfg.onFinish();
+      if (cfg.graded === false) { finishUngraded(); return; }
+      var pts = 0, c = 0, cl = 0, w = 0, chars = 0, ms = 0;
+      results.forEach(function (r) {
+        if (r.grade === "correct") { pts += 1; c++; } else if (r.grade === "close") { pts += 0.5; cl++; } else w++;
+        chars += r.chars; ms += r.ms;
+      });
+      var pct = Math.round(pts / results.length * 100);
+      var wpm = ms ? Math.round((chars / 5) / (ms / 60000)) : 0;
+      var missed = results.filter(function (r) { return r.grade !== "correct"; }).map(function (r) { return r.item; });
+      if (cfg.onComplete) cfg.onComplete({ wpm: wpm, acc: pct, count: results.length, when: Date.now() });
+      var rows = results.map(function (r) {
+        var label = cfg.label(r.item);
+        var detail = r.grade === "correct"
+          ? '<div class="sl-t">' + escHtml(r.typed) + "</div>"
+          : '<div class="sl-t">You typed: <b>' + escHtml(r.typed) + '</b></div><div class="sl-t">Answer: <b>' + escHtml(r.item.answer) + "</b></div>";
+        return '<li><div class="sl-q"><span class="chip ' + r.grade + '">' + GRADE_LABEL[r.grade] + "</span><span>" + escHtml(label) + "</span></div>" + detail + "</li>";
+      }).join("");
+      sum.innerHTML =
+        "<h2>Session complete</h2>" +
+        '<div class="res-top">' +
+          '<div class="big"><div class="v">' + pct + '%</div><div class="l">Score</div></div>' +
+          '<div class="medium"><div class="v">' + wpm + '</div><div class="l">Typing speed (WPM)</div></div>' +
+          '<div class="medium"><div class="v">' + c + "/" + results.length + '</div><div class="l">Fully correct</div></div>' +
+          '<div class="medium"><div class="v">' + cl + '</div><div class="l">Almost there</div></div>' +
+        "</div>" +
+        tierHtml(wpm) + weakHtml() + '<ul class="sum-list">' + rows + "</ul>" +
+        '<div class="res-actions">' +
+          (missed.length ? '<button type="button" class="btn" data-act="retry">Retry the ones I missed</button>' : "") +
+          '<button type="button" class="btn' + (missed.length ? " ghost" : "") + '" data-act="again">Practise again</button>' +
+          '<button type="button" class="btn ghost" data-act="copy">Copy results (CSV)</button>' +
+          '<button type="button" class="btn ghost" data-act="exit">Back to setup</button>' +
+        "</div>";
+      var first = sum.querySelector(".btn");
+      if (first) first.focus();
+      sum._missed = missed;
+    }
+
+    sum.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-act]");
+      if (!b) return;
+      var act = b.getAttribute("data-act");
+      if (act === "retry") R.start(sum._missed.slice());
+      else if (act === "copy") copyCsv(b);
+      else if (act === "again") R.start(cfg.rebuild());
+      else R.exit();
+    });
+    run.querySelector(".run-quit").addEventListener("click", R.exit);
+
+    ta.addEventListener("beforeinput", function (e) {
+      if (phase !== "answer") { e.preventDefault(); return; }
+      var t = e.inputType || "";
+      if (t === "insertFromPaste" || t === "insertFromDrop" || t === "insertFromYank") { e.preventDefault(); flash(); return; }
+      if (t.indexOf("insert") === 0) { if (!tFirst) tFirst = performance.now(); ins += e.data ? e.data.length : 1; }
+      else if (t.indexOf("delete") === 0) { del++; var gone = ta.value.slice(-1).toLowerCase(); if (/\S/.test(gone)) fixedKeys[gone] = (fixedKeys[gone] || 0) + 1; }
+    });
+    function flash() {
+      setHint("Pasting is off. Type your answer.", true);
+      clearTimeout(hintTimer);
+      hintTimer = setTimeout(function () { setHint(phase === "answer" ? HINT_ANSWER : hint.innerHTML, false); }, 2200);
+    }
+    ta.addEventListener("paste", function (e) { e.preventDefault(); flash(); });
+    ta.addEventListener("drop", function (e) { e.preventDefault(); flash(); });
+    ta.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        if (e.repeat) return;
+        if (phase === "answer") submit(); else next();
+      } else if (cfg.onTab && e.altKey && !e.ctrlKey && !e.metaKey && (e.code === "KeyR" || String(e.key).toLowerCase() === "r")) {
+        e.preventDefault();
+        cfg.onTab();
+      }
+    });
+    return R;
+  }
+
+  /* ================= REVIEWER ================= */
+  var reviewer = (function () {
+    var KEY = "tempo-reviewer-v1";
+    var deck = loadList(KEY).filter(function (d) { return d && d.q; });
+    var SAMPLES = {
+      "Livelihood": [
+        "Explain how you would start a small sari-sari store with a limited budget.",
+        "Describe how a farmer, fisher, or market vendor earns a living in your community.",
+        "How would you teach a family member to budget their weekly income?",
+        "What is the difference between saving and investing? Give an example.",
+        "Describe a side hustle you could start this month and who your customers would be.",
+        "Explain how you would price a product so you still earn a profit.",
+        "Why is it important to keep an emergency fund?",
+        "Describe the pros and cons of working abroad as an OFW.",
+        "How would you sell food online from your home kitchen?",
+        "What skills help a person find a better-paying job?",
+        "Explain what a cooperative is and how it helps its members.",
+        "Describe how you would handle a customer who complains about your product.",
+        "What are the benefits of registering a small business?",
+        "How can a family reduce their monthly electricity and water bills?",
+        "Explain how interest works on a loan.",
+        "Describe a typical day for someone who drives a jeepney or tricycle.",
+        "What should you check before borrowing money?",
+        "How can a student earn money without hurting their studies?",
+        "Explain why having more than one source of income is a smart idea.",
+        "Describe how you would plan a family budget after losing one source of income."
+      ],
+      "History": [
+        "Explain why the 1986 EDSA People Power Revolution is important to Filipinos.",
+        "Describe what Jose Rizal contributed to the Philippines' national identity.",
+        "Summarise what happened when Philippine independence was declared in 1898.",
+        "Why do historians study primary sources? Give an example.",
+        "Describe one historical event that changed how people live today.",
+        "Explain what happened during the Battle of Mactan in 1521.",
+        "Who was Andres Bonifacio and what did the Katipunan fight for?",
+        "Describe how the printing press changed the world.",
+        "Explain the main causes of the First World War.",
+        "What was the Industrial Revolution and how did it change work?",
+        "Describe the role of women in the Philippine Revolution.",
+        "Explain how Spanish colonisation shaped Philippine culture and religion.",
+        "Describe what life was like in the Philippines during World War II.",
+        "Explain why the Berlin Wall was built and why it came down.",
+        "What was the importance of the Silk Road for trade and ideas?",
+        "Describe how the ancient Egyptians built the pyramids.",
+        "Explain what the Renaissance was and why it mattered.",
+        "Describe why Independence Day matters in the Philippines.",
+        "What lessons can we learn from studying history?",
+        "Describe how the 1969 moon landing inspired science and technology."
+      ],
+      "Job interview": [
+        "Tell me about yourself in three sentences.",
+        "Why do you want this job, and why should we hire you?",
+        "Describe a time you solved a difficult problem at work or school.",
+        "What is your biggest weakness, and how are you improving it?",
+        "Where do you see yourself in five years?",
+        "What are your greatest strengths?",
+        "Describe a time you worked well in a team.",
+        "How do you handle pressure and tight deadlines?",
+        "Tell me about a mistake you made and what you learned from it.",
+        "Why did you leave your last job?",
+        "What do you know about our company?",
+        "How would your coworkers describe you?",
+        "Describe how you deal with a difficult coworker or customer.",
+        "What salary are you expecting, and why?",
+        "Tell me about a goal you set and how you achieved it.",
+        "How do you prioritise when you have many tasks at once?",
+        "Describe a time you took initiative without being asked.",
+        "What motivates you to do your best work?",
+        "Do you have any questions for us?",
+        "Why should we choose you over other candidates?"
+      ],
+      "Technology": [
+        "Explain what the internet is to someone who has never used it.",
+        "What is the difference between a website and a mobile app?",
+        "Describe how you would keep your online accounts safe from scammers.",
+        "Explain what artificial intelligence is in simple words.",
+        "How has mobile technology changed the way people send money or shop?",
+        "What is cloud storage and why do people use it?",
+        "Explain what a strong password looks like and why it matters.",
+        "Describe how social media can help and harm young people.",
+        "What is phishing and how can you spot it?",
+        "Explain the difference between hardware and software.",
+        "Describe how GPS helps people find their way.",
+        "What is two-factor authentication and why should you use it?",
+        "Explain how online banking works and how to use it safely.",
+        "Describe how technology helps students learn from home.",
+        "What is a computer virus and how can you protect your device?",
+        "Explain what Wi-Fi is and how it differs from mobile data.",
+        "Describe how e-commerce changed the way businesses sell.",
+        "What are the pros and cons of working remotely?",
+        "Explain what a backup is and how often you should make one.",
+        "Describe one new technology you think will change daily life soon."
+      ],
+      "Everyday life": [
+        "Describe your ideal weekend.",
+        "Write a short email asking your manager for a day off.",
+        "Explain how you would teach a friend to make a cup of coffee.",
+        "Describe the place where you grew up.",
+        "What is one skill you want to learn this year, and why?",
+        "Describe your favourite meal and how it is prepared.",
+        "Explain how you stay healthy and active.",
+        "Describe a memorable trip you took with family or friends.",
+        "What does a good friend mean to you?",
+        "Explain how you manage your time on a busy day.",
+        "Describe your morning routine from waking up to leaving home.",
+        "What would you do with a free day and no obligations?",
+        "Describe a person who inspires you and why.",
+        "Explain how you would help a neighbour in need.",
+        "Write a short message thanking someone who helped you.",
+        "Describe how your community celebrates a favourite festival.",
+        "What are three habits you want to build, and why?",
+        "Explain how you deal with stress.",
+        "Describe the best advice you ever received.",
+        "Write a short message inviting friends to your birthday."
+      ],
+      "Customer service": [
+        "Greet a customer who has just walked into your shop.",
+        "How would you respond to a customer who is angry about a late delivery?",
+        "Explain how you would handle a refund request politely.",
+        "Write a short reply to a customer asking if an item is still available.",
+        "Describe what good customer service means to you.",
+        "How do you stay calm when a customer is rude?",
+        "Write a message apologising for a mistake with someone's order.",
+        "Explain how you would say no to a request without upsetting the customer.",
+        "Describe how you would help a customer who cannot decide what to buy.",
+        "What should you do when you do not know the answer to a customer's question?",
+        "Write a short thank-you message to a loyal customer.",
+        "Describe how you would handle a long queue of waiting customers.",
+        "Explain why listening is important in customer service.",
+        "How would you respond to a negative online review?",
+        "Describe how you would explain a delay to a customer clearly and honestly.",
+        "Write a polite message asking a customer to wait while you check.",
+        "What makes a customer want to return to a business?",
+        "Explain how you would handle a customer who wants a discount you cannot give.",
+        "Describe how you would teach a new teammate to answer phone calls professionally.",
+        "Write a short message following up with a customer after a purchase."
+      ],
+      "Health and wellness": [
+        "Describe a healthy daily routine for a busy student.",
+        "Why is drinking enough water important?",
+        "Explain how regular exercise helps the body and mind.",
+        "What are the benefits of getting enough sleep?",
+        "Describe how to wash your hands properly and why it matters.",
+        "Explain what a balanced meal looks like.",
+        "How can someone manage stress during exams or a busy work week?",
+        "Describe the warning signs that it is time to see a doctor.",
+        "Explain why vaccines are important for a community.",
+        "What are simple ways to stay active without a gym?",
+        "Describe how you would care for a family member who has the flu.",
+        "Explain why mental health matters as much as physical health.",
+        "What are the risks of too much screen time?",
+        "Describe how to prepare a simple, healthy lunch on a small budget.",
+        "Explain how to prevent dengue in your neighbourhood.",
+        "Why is it important to take breaks while working?",
+        "Describe how to stay safe in very hot weather.",
+        "Explain what first aid is and why everyone should learn it.",
+        "What habits help a person keep a healthy weight?",
+        "Describe how friends and family can support someone who feels sad."
+      ],
+      "Education": [
+        "Explain how you study best and why it works for you.",
+        "Describe a teacher who made a difference in your life.",
+        "What are the benefits of reading books regularly?",
+        "Explain how to prepare for an important exam.",
+        "Describe how online classes differ from classroom learning.",
+        "Why is it important to learn more than one language?",
+        "Explain how to take good notes during a lecture.",
+        "Describe how you would help a classmate who is struggling.",
+        "What does it mean to be a lifelong learner?",
+        "Explain how to avoid putting off your schoolwork.",
+        "Describe how you would organise a group project with four people.",
+        "Why is critical thinking an important skill?",
+        "Explain the value of learning from your mistakes.",
+        "Describe how to find reliable information for a research paper.",
+        "What subject do you enjoy most, and what makes it interesting?",
+        "Explain how technology can make learning more fun.",
+        "Describe how to give a clear and confident class presentation.",
+        "Why do scholarships matter for students?",
+        "Explain how to balance study time and rest.",
+        "Describe what you hope to achieve through your education."
+      ],
+      "Travel and places": [
+        "Describe a place in the Philippines every traveller should visit.",
+        "Explain how you would plan a three-day trip on a small budget.",
+        "Describe what you would pack for a week at the beach.",
+        "What are the benefits of travelling to new places?",
+        "Explain how to stay safe when travelling alone.",
+        "Describe the best way to get around your city.",
+        "Write a short message booking a room at a hotel.",
+        "Explain how to be a respectful tourist in another culture.",
+        "Describe a local dish a visitor should try and where to find it.",
+        "What should you check before travelling abroad?",
+        "Describe how you would give directions to a lost tourist.",
+        "Explain the pros and cons of travelling by bus, plane, and ferry.",
+        "Describe your dream holiday destination and why.",
+        "How can travellers protect the environment?",
+        "Explain how to find good deals on flights and hotels.",
+        "Describe a long trip you took and how you passed the time.",
+        "What makes a city good for visitors?",
+        "Write a short message asking a friend to recommend places to visit.",
+        "Explain how to prepare for a typhoon while travelling.",
+        "Describe how travel can change the way a person thinks."
+      ],
+      "Science and nature": [
+        "Explain how plants make their own food.",
+        "Describe the water cycle in simple words.",
+        "Why is biodiversity important for our planet?",
+        "Explain why some places have a rainy season and a dry season.",
+        "Describe how typhoons form and why they are dangerous.",
+        "Explain what recycling is and why it helps.",
+        "Describe how the human heart works.",
+        "What is climate change and how can people respond to it?",
+        "Explain why earthquakes happen in the Philippines.",
+        "Describe how bees help produce our food.",
+        "Explain the difference between weather and climate.",
+        "Why are coral reefs and mangroves important?",
+        "Describe how a rainbow forms.",
+        "Explain what renewable energy is and give two examples.",
+        "Describe how scientists test a new idea.",
+        "What happens to the food we eat after we swallow it?",
+        "Explain why the sky looks blue during the day.",
+        "Describe how you would care for a vegetable garden.",
+        "Explain why we should protect the oceans from plastic.",
+        "Describe one animal and how it survives in its habitat."
+      ]
+    };
+    var status = $("rvStatus");
+    var HKEY = "tempo-reviewer-history-v1";
+    var sessions = loadList(HKEY).filter(function (s) { return s && typeof s.wpm === "number"; });
+    function renderHistory() {
+      var best = sessions.reduce(function (m, s) { return Math.max(m, s.wpm); }, 0);
+      $("rvBest").textContent = best ? "Best " + best + " WPM" : "";
+      $("rvHistory").innerHTML = sessions.length
+        ? sessions.map(function (s) {
+            var d = new Date(s.when || Date.now()).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+            return "<li><span>" + d + ": " + s.count + (s.count === 1 ? " question, " : " questions, ") + s.acc + "% accuracy</span><b>" + s.wpm + " WPM</b></li>";
+          }).join("")
+        : '<li style="display:block;border:0;padding:0"><p class="empty">Finish a session and your results will show up here.</p></li>';
+    }
+
+    var runner = Runner($("rvRunner"), {
+      noun: "Question",
+      graded: false,
+      onComplete: function (s) { sessions.unshift(s); sessions = sessions.slice(0, 8); saveList(HKEY, sessions); renderHistory(); },
+      renderPrompt: function (item, area) { area.innerHTML = '<div class="dict-meta" style="margin:0 0 6px">' + escHtml(item.cat || "") + '</div><div class="run-q">' + escHtml(item.q) + "</div>"; },
+      label: function (item) { return item.q; },
+      rebuild: function () { return build(); },
+      onExit: function () { $("rvSetup").hidden = false; $("rvHistoryCard").hidden = false; }
+    });
+
+    function build() {
+      var f = $("rvFilter").value;
+      var pool = deck.filter(function (d) { return !f || (d.cat || "My questions") === f; });
+      var items = (pool.length ? pool : deck).map(function (d) { return { q: d.q, cat: d.cat || "My questions" }; });
+      var own = items.filter(function (x) { return x.cat === "My questions"; });
+      var picked = shuffle(items.filter(function (x) { return x.cat !== "My questions"; }));
+      var n = parseInt($("rvNum").value, 10);
+      if (n) picked = picked.slice(0, n);
+      return shuffle(own.concat(picked));
+    }
+    function render() {
+      $("rvCount").textContent = deck.length ? deck.length + (deck.length === 1 ? " item" : " items") : "";
+      var cats = [];
+      deck.forEach(function (d) { var c = d.cat || "My questions"; if (cats.indexOf(c) < 0) cats.push(c); });
+      var fv = $("rvFilter").value;
+      $("rvFilter").innerHTML = '<option value="">All categories</option>' + cats.map(function (c) { return "<option>" + escHtml(c) + "</option>"; }).join("");
+      $("rvFilter").value = cats.indexOf(fv) >= 0 ? fv : "";
+      $("rvStart").disabled = !deck.length;
+      $("rvClear").disabled = !deck.length;
+      $("rvList").innerHTML = deck.length
+        ? deck.map(function (d, i) {
+            return '<li><div class="item-main"><div class="q">' + escHtml(d.q) + '</div><div class="a">' + escHtml(d.cat || "My questions") + '</div></div>' +
+              '<div class="item-actions"><button type="button" class="icon-btn" data-i="' + i + '" aria-label="Delete question">&times;</button></div></li>';
+          }).join("")
+        : '<li><p class="empty">No questions yet. Add one on the left or load the sample questions to try it out.</p></li>';
+    }
+    function add(q) {
+      q = q.trim();
+      if (!q) return false;
+      deck.push({ q: q, cat: $("rvCat").value || "My questions" });
+      return true;
+    }
+    $("rvAdd").addEventListener("click", function () {
+      if (add($("rvQ").value)) {
+        saveList(KEY, deck); render();
+        $("rvQ").value = ""; $("rvQ").focus();
+        status.textContent = "Question added.";
+      } else status.textContent = "Type a question first.";
+    });
+    $("rvQ").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $("rvAdd").click(); } });
+    $("rvSample").addEventListener("click", function () {
+      var sel = $("rvSampleCat").value, added = 0;
+      Object.keys(SAMPLES).forEach(function (c) {
+        if (sel && sel !== c) return;
+        SAMPLES[c].forEach(function (q) {
+          if (!deck.some(function (d) { return d.q === q; })) { deck.push({ q: q, cat: c }); added++; }
+        });
+      });
+      saveList(KEY, deck); render();
+      status.textContent = added ? added + " sample questions added" + (sel ? " to " + sel + "." : " from every category.") : "Those samples are already in your list.";
+    });
+    $("rvImport").addEventListener("click", function () {
+      var n = 0, skipped = 0;
+      $("rvBulk").value.split(/\r?\n/).forEach(function (line) {
+        if (!line.trim()) return;
+        if (add(line)) n++; else skipped++;
+      });
+      saveList(KEY, deck); render();
+      if (n) $("rvBulk").value = "";
+      status.textContent = n ? n + (n === 1 ? " question added." : " questions added.") : "Nothing to add. Type one question per line.";
+    });
+    $("rvList").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-i]");
+      if (!b) return;
+      deck.splice(parseInt(b.getAttribute("data-i"), 10), 1);
+      saveList(KEY, deck); render();
+    });
+    var clearArmed = false, clearTimer = null;
+    function disarmClear() { clearArmed = false; clearTimeout(clearTimer); $("rvClear").textContent = "Clear all"; }
+    $("rvClear").addEventListener("click", function () {
+      if (!deck.length) return;
+      if (!clearArmed) {
+        clearArmed = true;
+        this.textContent = "Click again to remove all " + deck.length;
+        status.textContent = "This removes every question. Click the button again to confirm.";
+        clearTimer = setTimeout(function () { disarmClear(); status.textContent = ""; }, 4000);
+        return;
+      }
+      disarmClear(); deck = []; saveList(KEY, deck); render(); status.textContent = "All questions removed.";
+    });
+    $("rvStart").addEventListener("click", function () {
+      if (!deck.length) return;
+      $("rvSetup").hidden = true;
+      $("rvHistoryCard").hidden = true;
+      runner.start(build());
+    });
+    var catNames = Object.keys(SAMPLES);
+    $("rvCat").innerHTML = '<option>My questions</option>' + catNames.map(function (c) { return "<option>" + c + "</option>"; }).join("");
+    $("rvSampleCat").innerHTML = '<option value="">All categories</option>' + catNames.map(function (c) { return "<option>" + c + "</option>"; }).join("");
+    render();
+    renderHistory();
+    return { focus: function () { if (!$("rvRunner").hidden) runner.focus(); } };
+  })();
+
+  /* ================= DICTATION ================= */
+  var dictation = (function () {
+    var KEY = "tempo-dictation-v1";
+    var passages = loadList(KEY).filter(function (p) { return p && p.text; });
+    var SAMPLE = [
+      "Please send the signed forms to the office by Friday afternoon. If you have any questions, call the front desk before noon.",
+      "Our meeting has moved to Room 204 and will start at half past three. Bring your laptop and a copy of the quarterly report.",
+      "The package was delivered to the wrong address. Please check the tracking number and contact the courier today."
+    ];
+    var status = $("dcStatus");
+    var HKEY = "tempo-dictation-history-v1";
+    var sessions = loadList(HKEY).filter(function (s) { return s && typeof s.wpm === "number"; });
+    function renderHistory() {
+      var best = sessions.reduce(function (m, s) { return Math.max(m, s.wpm); }, 0);
+      $("dcBest").textContent = best ? "Best " + best + " WPM" : "";
+      $("dcHistory").innerHTML = sessions.length
+        ? sessions.map(function (s) {
+            var d = new Date(s.when || Date.now()).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+            return "<li><span>" + d + ": " + s.count + (s.count === 1 ? " part, " : " parts, ") + s.acc + "% score</span><b>" + s.wpm + " WPM</b></li>";
+          }).join("")
+        : '<li style="display:block;border:0;padding:0"><p class="empty">Finish a dictation and your results will show up here.</p></li>';
+    }
+    var audioEl = new Audio();
+    var current = null, plays = 0, maxPlays = Infinity, answered = false, currentPassage = null;
+    var pendingAudio = null, mediaRec = null, mediaStream = null, source = "tts";
+    var voices = [];
+    var SVG_PLAY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+
+    function strictOn() { return $("dcStrict").value === "strict"; }
+    function splitSentences(text) {
+      var m = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g) || [];
+      return m.map(function (s) { return s.trim(); }).filter(Boolean);
+    }
+    function buildItems(p) {
+      if (p.audio) return [{ answer: p.text.trim(), audio: p.audio }];
+      return splitSentences(p.text).map(function (s) { return { answer: s }; });
+    }
+    function readMax() { var v = $("dcReplays").value; return v === "inf" ? Infinity : parseInt(v, 10) + 1; }
+
+    function stopAudio() {
+      try { audioEl.pause(); } catch (e) {}
+      if (window.speechSynthesis) { try { speechSynthesis.cancel(); } catch (e) {} }
+      setPlaying(false);
+    }
+    function setPlaying(b) { var p = $("dcPlay"); if (p) p.classList.toggle("playing", !!b); }
+    function updateDict() {
+      var meta = $("dcMeta"), btn = $("dcPlay");
+      if (!meta || !btn) return;
+      var exhausted = !answered && plays >= maxPlays;
+      btn.disabled = exhausted;
+      var left = maxPlays === Infinity ? null : Math.max(0, maxPlays - plays);
+      if (answered || left === null) meta.textContent = "Press Alt+R to hear it again.";
+      else meta.textContent = left > 0 ? "Plays left: " + left + ". Press Alt+R to replay." : "No replays left.";
+    }
+    function note(t) { var m = $("dcMeta"); if (m) m.textContent = t; }
+    function voiceByName(n) { for (var i = 0; i < voices.length; i++) if (voices[i].name === n) return voices[i]; return null; }
+
+    function play() {
+      if (!current) return;
+      if (!answered && plays >= maxPlays) return;
+      plays++; updateDict();
+      stopAudio();
+      if (current.audio) {
+        audioEl.src = current.audio;
+        setPlaying(true);
+        var pr = audioEl.play();
+        if (pr && pr.catch) pr.catch(function () { plays = Math.max(0, plays - 1); setPlaying(false); updateDict(); note("Playback was blocked. Press the play button."); });
+      } else if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
+        var u = new SpeechSynthesisUtterance(current.answer);
+        u.rate = parseFloat($("dcSpeed").value) || 1;
+        var v = voiceByName($("dcVoice").value);
+        if (v) { u.voice = v; u.lang = v.lang; }
+        u.onend = u.onerror = function () { setPlaying(false); };
+        setPlaying(true);
+        speechSynthesis.speak(u);
+      } else {
+        note("This browser can't read text aloud. Try another browser or add your own recording.");
+      }
+    }
+    audioEl.onended = function () { setPlaying(false); };
+
+    var runner = Runner($("dcRunner"), {
+      noun: "Part",
+      tabHint: "Press <kbd>Alt</kbd> + <kbd>R</kbd> (<kbd>Option</kbd> + <kbd>R</kbd> on Mac) to replay the audio.",
+      strict: strictOn,
+      renderPrompt: function (item, area) {
+        current = item; plays = 0; answered = false; maxPlays = readMax();
+        area.innerHTML =
+          '<div class="dict"><button type="button" class="play" id="dcPlay" aria-label="Play audio">' + SVG_PLAY + "</button>" +
+          '<div><div class="dict-title">Listen, then type what you hear.</div><div class="dict-meta" id="dcMeta"></div></div></div>';
+        $("dcPlay").addEventListener("click", function () { play(); runner.focus(); });
+        updateDict();
+        setTimeout(function () { if (current === item && !answered) play(); }, 350);
+      },
+      onSubmit: function () { answered = true; updateDict(); },
+      onTab: play,
+      label: function (item) { var t = item.answer; return t.length > 70 ? t.slice(0, 67) + "..." : t; },
+      rebuild: function () { return buildItems(currentPassage); },
+      onFinish: stopAudio,
+      onComplete: function (s) { sessions.unshift(s); sessions = sessions.slice(0, 8); saveList(HKEY, sessions); renderHistory(); },
+      onExit: function () { stopAudio(); current = null; $("dcSetup").hidden = false; $("dcHistoryCard").hidden = false; }
+    });
+
+    /* voices */
+    function loadVoices() {
+      if (!window.speechSynthesis) return;
+      voices = speechSynthesis.getVoices() || [];
+      var sel = $("dcVoice"), cur = sel.value;
+      var sorted = voices.slice().sort(function (a, b) {
+        var ae = /^en/i.test(a.lang) ? 0 : 1, be = /^en/i.test(b.lang) ? 0 : 1;
+        return ae - be || a.name.localeCompare(b.name);
+      });
+      sel.innerHTML = '<option value="">Default voice</option>' + sorted.map(function (v) {
+        return '<option value="' + escHtml(v.name) + '">' + escHtml(v.name + " (" + v.lang + ")") + "</option>";
+      }).join("");
+      sel.value = cur;
+    }
+    if (window.speechSynthesis) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+    $("dcSpeed").addEventListener("input", function () { $("dcSpeedV").textContent = parseFloat(this.value).toFixed(2) + "×"; });
+
+    /* setup */
+    function persist() {
+      saveList(KEY, passages.filter(function (p) { return !p.audio; }).map(function (p) { return { text: p.text }; }));
+    }
+    function render() {
+      $("dcCount").textContent = passages.length ? passages.length + (passages.length === 1 ? " item" : " items") : "";
+      $("dcList").innerHTML = passages.length
+        ? passages.map(function (p, i) {
+            var snip = p.text.length > 90 ? p.text.slice(0, 87) + "..." : p.text;
+            var kind = p.audio ? "Your recording (kept until you close this page)" : "Computer voice, " + splitSentences(p.text).length + " parts";
+            return '<li><div class="item-main"><div class="q">' + escHtml(snip) + '</div><div class="a">' + kind + "</div></div>" +
+              '<div class="item-actions"><button type="button" class="btn small" data-act="go" data-i="' + i + '">Practise</button>' +
+              '<button type="button" class="icon-btn" data-act="del" data-i="' + i + '" aria-label="Delete passage">&times;</button></div></li>';
+          }).join("")
+        : '<li><p class="empty">No passages yet. Add one on the left or load the samples to try it out.</p></li>';
+    }
+    $("dcList").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-act]");
+      if (!b) return;
+      var i = parseInt(b.getAttribute("data-i"), 10);
+      if (b.getAttribute("data-act") === "del") {
+        var p = passages.splice(i, 1)[0];
+        if (p && p.audio) { try { URL.revokeObjectURL(p.audio); } catch (er) {} }
+        persist(); render();
+      } else {
+        var items = buildItems(passages[i]);
+        if (!items.length) { status.textContent = "That passage has no text to practise."; return; }
+        currentPassage = passages[i];
+        $("dcSetup").hidden = true;
+        $("dcHistoryCard").hidden = true;
+        runner.start(items);
+      }
+    });
+    $("dcSample").addEventListener("click", function () {
+      SAMPLE.forEach(function (t) { if (!passages.some(function (p) { return p.text === t; })) passages.push({ text: t }); });
+      persist(); render(); status.textContent = "Sample passages added.";
+    });
+
+    /* audio source */
+    $("dcSource").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-src]");
+      if (!b) return;
+      source = b.getAttribute("data-src");
+      Array.prototype.forEach.call($("dcSource").children, function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+      $("dcRec").hidden = source !== "rec";
+    });
+    function setPending(url) {
+      if (pendingAudio && pendingAudio !== url) { try { URL.revokeObjectURL(pendingAudio); } catch (e) {} }
+      pendingAudio = url;
+      var pv = $("dcPreview");
+      if (url) { pv.src = url; pv.hidden = false; } else { pv.removeAttribute("src"); pv.hidden = true; }
+    }
+    $("dcFile").addEventListener("change", function () {
+      var f = this.files && this.files[0];
+      if (!f) return;
+      setPending(URL.createObjectURL(f));
+      $("dcRecNote").textContent = "Loaded " + f.name + ". Check it sounds right, then add the passage.";
+      this.value = "";
+    });
+    $("dcRecBtn").addEventListener("click", function () {
+      var btn = this;
+      if (mediaRec) { mediaRec.stop(); return; }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+        $("dcRecNote").textContent = "Recording isn't available in this browser. Upload an audio file instead.";
+        return;
+      }
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+        var chunks = [];
+        mediaStream = stream;
+        mediaRec = new MediaRecorder(stream);
+        mediaRec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+        mediaRec.onstop = function () {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          var type = (mediaRec && mediaRec.mimeType) || "audio/webm";
+          mediaRec = null; mediaStream = null;
+          btn.textContent = "Record again"; btn.classList.remove("rec-on");
+          if (chunks.length) {
+            setPending(URL.createObjectURL(new Blob(chunks, { type: type })));
+            $("dcRecNote").textContent = "Recorded. Play it back, then add the passage.";
+          } else $("dcRecNote").textContent = "Nothing was recorded. Try again.";
+        };
+        mediaRec.start();
+        btn.textContent = "Stop recording"; btn.classList.add("rec-on");
+        $("dcRecNote").textContent = "Recording... read the passage aloud.";
+      }).catch(function () {
+        $("dcRecNote").textContent = "Microphone access isn't available here. Upload an audio file instead.";
+      });
+    });
+    $("dcAdd").addEventListener("click", function () {
+      var text = $("dcText").value.trim();
+      if (!text) { status.textContent = "Type the words that the audio says first."; return; }
+      if (source === "rec") {
+        if (!pendingAudio) { status.textContent = "Record or upload audio first, or switch to Computer voice."; return; }
+        passages.push({ text: text, audio: pendingAudio });
+        pendingAudio = null; setPending(null);
+        $("dcRecBtn").textContent = "Record"; $("dcRecNote").textContent = "Read the passage aloud, then stop.";
+      } else passages.push({ text: text });
+      $("dcText").value = "";
+      persist(); render(); status.textContent = "Passage added.";
+    });
+
+    render();
+    renderHistory();
+    return { leave: function () { stopAudio(); }, focus: function () { if (!$("dcRunner").hidden) runner.focus(); } };
+  })();
+
+  /* ================= SPEED TEST ================= */
+  var speed = (function () {
+    var WORDS = ("the of and to a in is it you that he was for on are with as I his they be at one have this from or had by hot word but what some we can out other were all there when up use your how said an each she which do their time if will way about many then them write would like so these her long make thing see him two has look more day could go come did number sound no most people my over know water than call first who may down side been now find any new work part take get place made live where after back little only round man year came show every good me give our under name very through just form sentence great think say help low line differ turn cause much mean before move right boy old too same tell does set three want air well also play small end put home read hand port large spell add even land here must big high such follow act why ask men change went light kind off need house picture try us again animal point mother world near build self earth father head stand own page should country found answer school grow study still learn plant cover food sun four between state keep eye never last let thought city tree cross farm hard start might story saw far sea draw left late run while press close night real life few north open seem together next white children begin got walk example ease paper group always music those both mark often letter until mile river car feet care second book carry took science eat room friend began idea fish mountain stop once base hear horse cut sure watch color face wood main enough plain girl usual young ready above ever red list though feel talk bird soon body dog family direct pose leave song measure door product black short numeral class wind question happen complete ship area half rock order fire south problem piece told knew pass since top whole king space heard best hour better true during hundred five remember step early hold west ground interest reach fast verb sing listen six table travel less morning ten simple several vowel toward war lay against pattern slow center love person money serve appear road map rain rule govern pull cold notice voice unit power town fine certain fly fall lead cry dark machine note wait plan figure star box noun field rest correct able pound done beauty drive stood contain front teach week final gave green oh quick develop ocean warm free minute strong special mind behind clear tail produce fact street inch multiply nothing course stay wheel full force blue object decide surface deep moon island foot system busy test record boat common gold possible plane stead dry wonder laugh thousand ago ran check game shape equate miss brought heat snow tire bring yes distant fill east paint language among").split(" ");
+
+    var SENTENCES = [
+      "The morning market opens before sunrise, and the first customers arrive while the streets are still quiet.",
+      "A good habit is built slowly, one small action at a time, until it feels like a normal part of the day.",
+      "Rain tapped on the tin roof all night, and by morning the garden smelled fresh and green.",
+      "Learning to type well takes patience, because speed only comes after the fingers remember where every key lives.",
+      "The ferry crossed the bay in less than an hour, carrying students, farmers, and baskets of fresh fish.",
+      "When you read a question carefully, the answer often becomes easier to find than you first expected.",
+      "Clear writing respects the reader, so it uses short sentences, simple words, and one idea at a time.",
+      "The old bridge has stood over the river for a hundred years and still carries traffic every single day.",
+      "A balanced plan includes time for work, time for rest, and time for the people who matter most.",
+      "Street vendors prepare their stalls early, arranging fruit and snacks so that every item can be seen.",
+      "Good teams share information openly, ask for help when they are stuck, and celebrate small wins together.",
+      "The library was warm and silent, with long wooden tables and rows of books waiting to be opened.",
+      "Clouds gathered over the mountains in the afternoon, and soon a gentle storm rolled across the valley.",
+      "Saving a little money every week may feel slow, but over many months it grows into real security.",
+      "A strong password is long, unique, and never reused, which makes it hard for anyone to guess.",
+      "The festival filled the town with color, music, and the smell of grilled food drifting down the street.",
+      "Before you send an important message, read it once more to catch mistakes and make the tone kind.",
+      "Fishermen push their boats into the water at dawn and return at midday with nets full of silver fish.",
+      "Practice works best in short sessions with full attention, rather than in long hours of tired repetition.",
+      "The city never really sleeps, because delivery trucks, night shifts, and late buses keep it moving.",
+      "A curious mind asks why, tests an idea, and is not afraid to be wrong on the way to the truth.",
+      "Fresh bread cooled on the kitchen table while the family gathered to share stories from the week.",
+      "Planting trees along the road gives shade to walkers and a home to birds, and it cleans the air too.",
+      "Customers remember how they were treated long after they forget the exact price of what they bought.",
+      "The scientist wrote down every result, even the surprising ones, because honest data is the base of discovery.",
+      "On weekends the park fills with children flying kites, couples walking slowly, and vendors selling cold drinks.",
+      "A simple budget lists what comes in, what goes out, and how much can be set aside for the future.",
+      "The trail climbed through thick forest, crossed a cold stream, and ended at a view that stretched to the sea.",
+      "Typing without looking at the keys frees your eyes to follow the words and your mind to shape the ideas.",
+      "Many small businesses begin at a kitchen table with one good idea, a little courage, and a lot of work.",
+      "The teacher paused, smiled, and asked the class to explain the idea again in their own words.",
+      "Waves rolled gently onto the sand while the evening sky turned from gold to pink to deep blue.",
+      "A reliable website loads quickly, works on small screens, and makes the next step obvious to every visitor.",
+      "Drinking water, sleeping well, and taking short walks are small habits that protect both body and mind.",
+      "In the old town, narrow streets lead to quiet squares where neighbors sit and talk until the lamps come on.",
+      "Good questions open doors, because they show what we do not yet know and where to look next.",
+      "The farmer checked the sky, tested the soil with his hand, and decided it was time to plant the rice.",
+      "Traffic slowed to a crawl as the bus climbed the hill, but the passengers chatted and nobody seemed in a hurry.",
+      "A clear plan turns a big goal into small steps, and each step makes the next one feel possible.",
+      "The museum displayed tools, maps, and letters that showed how ordinary people lived long before our time.",
+      "Electric fans hummed in the afternoon heat while students worked quietly on their homework at the long table.",
+      "When two people disagree, listening first and speaking second often solves more than arguing ever could.",
+      "The lighthouse keeper climbed the spiral stairs every evening to light the lamp that guided ships to shore.",
+      "A tidy desk will not do the work for you, but it can make starting feel much lighter.",
+      "Markets across the country sell mangoes, bananas, and pineapples that taste sweeter than any imported fruit.",
+      "The network slowed down during the storm, so the team saved their work and waited for the signal to return.",
+      "Every language carries the humor, history, and habits of the people who have spoken it for generations.",
+      "Wind turbines turned slowly on the ridge, changing a steady breeze into power for thousands of homes.",
+      "The bakery on the corner opens at five, and by six there is already a line outside the door.",
+      "If you want to improve, measure your progress honestly, celebrate every gain, and learn from every slip.",
+      "A volcano can look peaceful for years, which is why scientists watch it carefully and share what they learn.",
+      "After the power cut, the neighborhood lit candles, shared stories, and watched the stars appear one by one.",
+      "Reading aloud helps children learn new words, and it helps parents slow down and enjoy the moment together.",
+      "The train pulled into the station right on time, and a crowd of travelers spilled onto the platform.",
+      "Honest feedback can be uncomfortable, yet it is one of the fastest ways to grow in any kind of work.",
+      "Coconut trees lined the beach, and their long shadows stretched across the sand as the sun went down.",
+      "A calm voice and a patient attitude can turn a frustrated customer into a loyal friend of the business.",
+      "The garden grew best when watered a little every day, rather than flooded once a week and forgotten.",
+      "Mountains shape the weather, the rivers, and even the stories of the people who live in their shadow.",
+      "Taking notes by hand slows you down just enough to think, which is why many students remember more that way.",
+      "The delivery rider checked the map, tightened his helmet, and set off through the busy evening traffic.",
+      "Our ancestors told stories around the fire to pass on lessons about courage, kindness, and respect for nature.",
+      "A short walk after lunch clears the head, lifts the mood, and makes the afternoon feel less heavy.",
+      "The old radio crackled for a moment, then filled the room with soft music from another decade.",
+      "When the tide goes out, the reef reveals tiny pools full of shells, crabs, and brightly colored fish.",
+      "Computers follow instructions exactly, so a missing comma or a misspelled word can change everything.",
+      "The village school had one room, two teachers, and a library that fit neatly inside a single cupboard.",
+      "Patience is not simply waiting; it is staying calm, working steadily, and trusting that effort will pay off.",
+      "Sunlight poured through the window and painted warm stripes across the wooden floor of the quiet kitchen.",
+      "Teamwork looks easy from the outside, but it depends on trust, clear roles, and a lot of honest talking.",
+      "A pot of rice, a bowl of soup, and a plate of fresh vegetables can make a simple and satisfying meal.",
+      "The bus driver knew every regular passenger by name and always waited a moment for anyone running to catch up.",
+      "A mistake is only a lesson in disguise when you take the time to understand what happened.",
+      "The river carried leaves and small branches past the village, slow and brown after a week of heavy rain.",
+      "Every great project starts with a rough draft, and every rough draft improves when someone reads it again.",
+      "A lantern swung gently from the boat as it drifted across the dark water toward the distant shore.",
+      "Be generous with thanks, because a few sincere words can brighten a day more than a grand gift.",
+      "Children raced down the dusty road after school, laughing and shouting as their bags bounced on their backs.",
+      "A healthy community looks after its elders, makes room for its youth, and keeps its shared spaces clean.",
+      "The mechanic listened to the engine, nodded slowly, and said the problem was small and easy to fix.",
+      "When you type a long answer, pause to breathe, keep your shoulders relaxed, and let your hands stay light.",
+      "The harvest moon rose over the fields, round and golden, and the workers finally put down their tools.",
+      "Good design hides its effort, so that using the product feels natural and nothing gets in the way.",
+      "A loan should be borrowed carefully, with a clear plan to repay it and a full understanding of the cost.",
+      "The island is small, but its beaches, caves, and forests give visitors enough to explore for a whole week.",
+      "Early in the morning, the temple bells rang softly and the streets filled with the smell of fresh rice cakes.",
+      "Writing a summary means keeping the main idea and leaving out the details that do not change the meaning.",
+      "The market was loud and crowded, yet every vendor somehow managed to keep a smile and a friendly word.",
+      "A good listener asks questions that show they were paying attention and care about the answer.",
+      "Students who review a little each day usually do better than those who try to learn everything the night before.",
+      "The sea was calm that morning, so the fishermen went out farther than usual and came back with a large catch.",
+      "A reliable friend shows up when things are difficult, tells the truth gently, and never keeps score.",
+      "Tall buildings glittered in the evening light while below them the streets filled with people heading home.",
+      "A well written email gets to the point in the first line, explains what is needed, and says thank you.",
+      "The jeepney rattled along the road, its bright paint shining and its radio playing a cheerful song.",
+      "Eating together as a family gives everyone a chance to talk, laugh, and feel connected after a long day.",
+      "The mountains were covered in mist at dawn, and the whole valley seemed to hold its breath.",
+      "To solve a hard problem, break it into smaller parts, test each part, and then put them back together.",
+      "The first rain of the season brought relief to the farmers and filled the dry creek beds again.",
+      "Kind words cost nothing, yet they can change the direction of an entire day.",
+      "The nurse checked the chart, smiled at the patient, and explained the next step in a calm, gentle voice.",
+      "Cooking a new recipe is an adventure, because every ingredient changes the smell, the color, and the taste.",
+      "A strong team celebrates effort as well as results, because effort is what makes future results possible.",
+      "Many people learn best by doing, so try the task yourself instead of only watching someone else.",
+      "The students built a small robot, tested it twice, fixed three problems, and finally watched it roll across the floor.",
+      "When the typhoon warning came, families packed bags, checked on neighbors, and moved to safer ground.",
+      "Reading a little every day builds your vocabulary, sharpens your thinking, and gives you stories to share.",
+      "Fireflies blinked in the dark garden, and the children sat very still so they would not scare them away.",
+      "With steady practice, the hands learn the shape of every word, and typing begins to feel like speaking.",
+      "The path through the rice terraces is steep, but every turn rewards the walker with a wider view.",
+      "Local shops give a neighborhood its character, and supporting them keeps money moving in the community.",
+      "The orchestra tuned their instruments, the room fell silent, and the conductor lifted her arms to begin.",
+      "At the end of the day, the best measure of progress is whether you are a little better than yesterday."
+    ];
+    var stage = $("stage"), wordsEl = $("words"), viewport = $("viewport"), input = $("input"), app = $("app");
+    var S = {
+      dur: 60, punct: true, queue: [], bag: [], words: [], els: [], wi: 0, typed: "", entered: [],
+      started: false, finished: false, t0: 0, keys: 0, good: 0, correctChars: 0, rawChars: 0,
+      samples: [], lastSecond: 0, timer: null, cap: true
+    };
+    function rand(n) { return Math.floor(Math.random() * n); }
+    function nextWord() {
+      if (S.punct) {
+        if (!S.queue.length) {
+          if (!S.bag.length) S.bag = shuffle(SENTENCES.slice());
+          S.queue = S.bag.pop().split(" ");
+        }
+        return S.queue.shift();
+      }
+      return WORDS[rand(WORDS.length)];
+    }
+    function fmt(sec) { sec = Math.max(0, Math.ceil(sec)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+    function addWords(n) {
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < n; i++) {
+        var w = nextWord(), idx = S.words.length;
+        S.words.push(w);
+        var el = document.createElement("span");
+        el.className = "w"; el.innerHTML = charsHtml(idx);
+        S.els.push(el); frag.appendChild(el); frag.appendChild(document.createTextNode(" "));
+      }
+      wordsEl.appendChild(frag);
+    }
+    function charsHtml(i) {
+      var w = S.words[i];
+      var t = i < S.wi ? S.entered[i] : (i === S.wi ? S.typed : "");
+      var active = i === S.wi && !S.finished;
+      var out = "", k;
+      for (k = 0; k < w.length; k++) {
+        var cls = "c";
+        if (k < t.length) cls += t[k] === w[k] ? " ok" : " bad";
+        else if (i < S.wi) cls += " miss";
+        if (active && k === t.length) cls += " cur";
+        if (active && t.length === w.length && t.length > 0 && k === w.length - 1) cls += " cur-after";
+        out += '<span class="' + cls + '">' + escHtml(w[k]) + "</span>";
+      }
+      for (k = w.length; k < t.length; k++) {
+        var c2 = "c bad";
+        if (active && k === t.length - 1) c2 += " cur-after";
+        out += '<span class="' + c2 + '">' + escHtml(t[k]) + "</span>";
+      }
+      return out;
+    }
+    function paint(i) { if (S.els[i]) S.els[i].innerHTML = charsHtml(i); }
+    function scrollToCurrent() {
+      var el = S.els[S.wi];
+      if (!el) return;
+      var lh = parseFloat(getComputedStyle(viewport).lineHeight) || 56;
+      wordsEl.style.transform = "translateY(" + (-Math.max(0, el.offsetTop - lh)) + "px)";
+    }
+    function focusInput() {
+      if (activeTab !== "speed") return;
+      try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
+    }
+    function reset(newWords) {
+      clearInterval(S.timer);
+      var keepWords = !newWords && S.words.length ? S.words.slice(0, 120) : null;
+      S.words = []; S.els = []; S.wi = 0; S.typed = ""; S.entered = [];
+      S.started = false; S.finished = false; S.keys = 0; S.good = 0;
+      S.correctChars = 0; S.rawChars = 0; S.samples = []; S.lastSecond = 0; S.cap = true; S.queue = []; S.bag = [];
+      wordsEl.innerHTML = ""; wordsEl.style.transform = "translateY(0)";
+      if (keepWords) {
+        var frag = document.createDocumentFragment();
+        keepWords.forEach(function (w, idx) {
+          S.words.push(w);
+          var el = document.createElement("span");
+          el.className = "w"; el.innerHTML = charsHtml(idx);
+          S.els.push(el); frag.appendChild(el); frag.appendChild(document.createTextNode(" "));
+        });
+        wordsEl.appendChild(frag);
+      } else addWords(120);
+      paint(0);
+      app.classList.remove("done");
+      stage.classList.add("idle"); stage.classList.remove("running");
+      $("timeV").textContent = fmt(S.dur); $("wpmV").textContent = "0"; $("accV").textContent = "100%";
+      $("bar").style.width = "0%"; $("hint").style.visibility = "visible";
+      input.value = "";
+      focusInput();
+    }
+    function partialCorrect() {
+      var w = S.words[S.wi] || "", n = 0;
+      for (var k = 0; k < S.typed.length && k < w.length; k++) { if (S.typed[k] === w[k]) n++; else break; }
+      return n;
+    }
+    function currentWpm(elapsed) { return elapsed < 1 ? 0 : Math.round(((S.correctChars + partialCorrect()) / 5) / (elapsed / 60)); }
+    function currentAcc() { return S.keys ? Math.round((S.good / S.keys) * 100) : 100; }
+    function start() {
+      S.started = true; S.t0 = performance.now();
+      stage.classList.remove("idle"); stage.classList.add("running");
+      $("hint").style.visibility = "hidden";
+      S.timer = setInterval(tick, 200);
+    }
+    function tick() {
+      if (S.finished) return;
+      var elapsed = (performance.now() - S.t0) / 1000;
+      if (elapsed >= S.dur) { finish(); return; }
+      var sec = Math.floor(elapsed);
+      if (sec > S.lastSecond) { for (var s = S.lastSecond + 1; s <= sec; s++) S.samples.push(currentWpm(s)); S.lastSecond = sec; }
+      $("timeV").textContent = fmt(S.dur - elapsed);
+      $("wpmV").textContent = currentWpm(elapsed);
+      $("accV").textContent = currentAcc() + "%";
+      $("bar").style.width = (elapsed / S.dur * 100) + "%";
+    }
+    function commitWord() {
+      if (S.typed === "") return;
+      var w = S.words[S.wi];
+      S.rawChars += S.typed.length + 1;
+      if (S.typed === w) S.correctChars += w.length + 1;
+      S.entered[S.wi] = S.typed;
+      S.keys++; S.good++;
+      var prev = S.wi;
+      S.wi++; S.typed = "";
+      paint(prev); paint(S.wi); scrollToCurrent();
+      if (S.words.length - S.wi < 60) addWords(60);
+    }
+    function handleInput(e) {
+      if (S.finished) { input.value = ""; return; }
+      var type = e.inputType || "";
+      if (type === "deleteContentBackward") S.typed = S.typed.slice(0, -1);
+      else if (type === "deleteWordBackward") S.typed = "";
+      else if (type.indexOf("insert") === 0 && e.data) {
+        for (var i = 0; i < e.data.length; i++) {
+          var ch = e.data[i];
+          if (!S.started) start();
+          if (ch === " ") { commitWord(); continue; }
+          S.keys++;
+          var w = S.words[S.wi];
+          if (S.typed.length < w.length && w[S.typed.length] === ch) S.good++;
+          if (S.typed.length < w.length + 12) S.typed += ch;
+        }
+      }
+      input.value = S.typed;
+      paint(S.wi); scrollToCurrent();
+    }
+    function finish() {
+      if (S.finished) return;
+      S.finished = true; clearInterval(S.timer);
+      var elapsed = S.dur;
+      var correct = S.correctChars + partialCorrect();
+      var raw = S.rawChars + S.typed.length;
+      var wpm = Math.round((correct / 5) / (elapsed / 60));
+      var rawWpm = Math.round((raw / 5) / (elapsed / 60));
+      var acc = currentAcc();
+      while (S.samples.length < S.dur) S.samples.push(wpm);
+      S.samples[S.samples.length - 1] = wpm;
+      paint(S.wi);
+      $("rWpm").textContent = wpm; $("rAcc").textContent = acc + "%"; $("rRaw").textContent = rawWpm; $("rChars").textContent = correct + "/" + raw;
+      drawChart(S.samples);
+      $("rTier").innerHTML = tierHtml(wpm);
+      var badge = $("badge"), best = loadStore(), prevBest = best.bests[S.dur];
+      if (wpm > 0 && (prevBest === undefined || wpm > prevBest)) {
+        badge.textContent = prevBest === undefined ? "First score saved for this length" : "New personal best (previous: " + prevBest + " WPM)";
+        badge.className = "badge pb"; best.bests[S.dur] = wpm;
+      } else {
+        badge.textContent = "Your best for this length: " + (prevBest !== undefined ? prevBest : wpm) + " WPM";
+        badge.className = "badge";
+      }
+      best.recent.unshift({ wpm: wpm, acc: acc, dur: S.dur });
+      best.recent = best.recent.slice(0, 6);
+      saveStore(best); renderBests();
+      app.classList.add("done");
+      $("againBtn").focus();
+    }
+    function drawChart(data) {
+      var svg = $("chart"), W = 700, H = 190, pl = 34, pr = 10, pt = 10, pb = 26;
+      var max = Math.max(10, Math.max.apply(null, data));
+      max = Math.ceil(max / 10) * 10;
+      var n = data.length;
+      var x = function (i) { return pl + (n <= 1 ? 0 : (i / (n - 1)) * (W - pl - pr)); };
+      var y = function (v) { return pt + (1 - v / max) * (H - pt - pb); };
+      var html = "";
+      for (var g = 0; g <= 4; g++) {
+        var v = Math.round(max * g / 4);
+        html += '<line class="grid" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '"/>';
+        html += '<text class="axis" x="' + (pl - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + "</text>";
+      }
+      var pts = data.map(function (d, i) { return x(i).toFixed(1) + "," + y(d).toFixed(1); });
+      html += '<polygon class="area" points="' + x(0) + "," + y(0) + " " + pts.join(" ") + " " + x(n - 1) + "," + y(0) + '"/>';
+      html += '<polyline class="line" points="' + pts.join(" ") + '"/>';
+      var ticks = Math.min(6, Math.floor(S.dur / 10));
+      for (var t = 0; t <= ticks; t++) {
+        var sec = Math.round(S.dur * t / ticks);
+        html += '<text class="axis" x="' + x(Math.max(0, sec - 1)) + '" y="' + (H - 6) + '" text-anchor="middle">' + fmt(sec) + "</text>";
+      }
+      svg.innerHTML = html;
+    }
+    function loadStore() {
+      var base = { bests: {}, recent: [] };
+      try {
+        var raw = localStorage.getItem("tempo-typing-v1");
+        if (!raw) return base;
+        var o = JSON.parse(raw);
+        if (o && o.bests && Array.isArray(o.recent)) return o;
+      } catch (e) {}
+      return base;
+    }
+    function saveStore(o) { try { localStorage.setItem("tempo-typing-v1", JSON.stringify(o)); } catch (e) {} }
+    function renderBests() {
+      var s = loadStore();
+      $("bestList").innerHTML = [[60, "1 minute"], [180, "3 minutes"], [300, "5 minutes"], [600, "10 minutes"]].map(function (r) {
+        var v = s.bests[r[0]];
+        return '<div class="best-row"><span>' + r[1] + "</span><b>" + (v === undefined ? "–" : v + " WPM") + "</b></div>";
+      }).join("");
+      var list = $("recentList");
+      list.innerHTML = !s.recent.length
+        ? '<li style="display:block;border:0;padding:0"><p class="empty">Finish a test and your results will show up here.</p></li>'
+        : s.recent.map(function (r) { return "<li><span>" + Math.round(r.dur / 60) + " min, " + r.acc + "% accurate</span><b>" + r.wpm + " WPM</b></li>"; }).join("");
+    }
+
+    input.addEventListener("input", handleInput);
+    input.addEventListener("focus", function () { stage.classList.remove("blurred"); });
+    input.addEventListener("blur", function () { if (!S.finished && activeTab === "speed") stage.classList.add("blurred"); });
+    viewport.addEventListener("mousedown", function (e) { e.preventDefault(); focusInput(); });
+    $("veil").addEventListener("mousedown", function (e) { e.preventDefault(); focusInput(); });
+    $("veil").addEventListener("touchstart", function () { focusInput(); }, { passive: true });
+    document.addEventListener("keydown", function (e) {
+      if (activeTab !== "speed") return;
+      if (e.key === "Escape") { e.preventDefault(); reset(true); return; }
+      if (S.finished) return;
+      var tag = (e.target && e.target.tagName) || "";
+      if (tag === "BUTTON" || tag === "SELECT") return;
+      if (e.target !== input && e.target.type !== "checkbox" && !e.ctrlKey && !e.metaKey && !e.altKey) focusInput();
+    });
+    $("durations").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-dur]");
+      if (!b) return;
+      S.dur = parseInt(b.getAttribute("data-dur"), 10);
+      Array.prototype.forEach.call($("durations").children, function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+      reset(false);
+    });
+    $("punct").addEventListener("change", function (e) { S.punct = e.target.checked; reset(true); });
+    $("restartBtn").addEventListener("click", function () { reset(true); });
+    $("againBtn").addEventListener("click", function () { reset(false); });
+    $("newBtn").addEventListener("click", function () { reset(true); });
+    window.addEventListener("resize", scrollToCurrent);
+    renderBests();
+    reset(true);
+    return {
+      enter: function () { scrollToCurrent(); focusInput(); },
+      leave: function () { if (S.started && !S.finished) reset(false); input.blur(); }
+    };
+  })();
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest(".tier-icon");
+    if (!t) return;
+    t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop");
+    t.addEventListener("animationend", function () { t.classList.remove("pop"); }, { once: true });
+  });
+
+  (function () {
+    var b = $("wipeBtn"), armed = false, timer = null;
+    b.addEventListener("click", function () {
+      if (!armed) {
+        armed = true; b.textContent = "Click again to erase everything";
+        timer = setTimeout(function () { armed = false; b.textContent = "Clear my saved data"; }, 4000);
+        return;
+      }
+      clearTimeout(timer); armed = false; b.textContent = "Clear my saved data";
+      try {
+        Object.keys(localStorage).filter(function (k) { return k.indexOf("tempo-") === 0; }).forEach(function (k) { localStorage.removeItem(k); });
+      } catch (e) {}
+      $("wipeNote").textContent = "Saved data erased. Reload the page for a clean start.";
+    });
+  })();
+
+  /* ================= theme toggle ================= */
+  (function () {
+    var b = $("themeBtn"), root = document.documentElement;
+    function eff() { return root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); }
+    function label() { b.textContent = eff() === "dark" ? "Light mode" : "Dark mode"; }
+    try { var s = localStorage.getItem("tempo-theme"); if (s === "light" || s === "dark") root.setAttribute("data-theme", s); } catch (e) {}
+    label();
+    b.addEventListener("click", function () {
+      var n = eff() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", n);
+      try { localStorage.setItem("tempo-theme", n); } catch (e) {}
+      label();
+    });
+  })();
+
+  /* ================= tabs ================= */
+  $("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-tab]");
+    if (!b) return;
+    var tab = b.getAttribute("data-tab");
+    if (tab === activeTab) return;
+    if (activeTab === "speed") speed.leave();
+    if (activeTab === "dictation") dictation.leave();
+    activeTab = tab;
+    Array.prototype.forEach.call($("tabs").children, function (c) {
+      c.setAttribute("aria-selected", c === b ? "true" : "false");
+      c.setAttribute("tabindex", c === b ? "0" : "-1");
+    });
+    ["review", "dictation", "speed"].forEach(function (t) { $("panel-" + t).hidden = t !== tab; });
+    if (tab === "speed") speed.enter();
+    else if (tab === "review") reviewer.focus();
+    else dictation.focus();
+  });
+  $("tabs").addEventListener("keydown", function (e) {
+    var tabs = Array.prototype.slice.call($("tabs").querySelectorAll("[role=tab]"));
+    var i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    var n = null;
+    if (e.key === "ArrowRight") n = tabs[(i + 1) % tabs.length];
+    else if (e.key === "ArrowLeft") n = tabs[(i - 1 + tabs.length) % tabs.length];
+    else if (e.key === "Home") n = tabs[0];
+    else if (e.key === "End") n = tabs[tabs.length - 1];
+    if (!n) return;
+    e.preventDefault(); n.click(); n.focus();
+  });
+})();
+</script>
+</body>
+</html>
