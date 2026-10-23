@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tempo – Typing practice for the real world</title>
 <meta name="description" content="Practise typing with your own questions, dictation from audio, and a timed speed test.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2f5bff">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232f5bff'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='monospace' font-weight='700'%3Et%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #edf1f5;
@@ -275,6 +278,14 @@
   @media (prefers-reduced-motion: reduce) { .tier-icon { animation: none !important; } }
   .foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted-strong); font-size: 14px; line-height: 1.5; max-width: 70ch; }
   .foot p { margin: 0 0 12px; }
+  .foot summary { padding: 13px 0; cursor: pointer; font-weight: 700; color: var(--ink); }
+  .foot .opts { margin: 6px 0 16px; max-width: 360px; }
+  .run-time { font-family: var(--mono); font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .card-img { display: block; max-width: 100%; margin-top: 14px; border-radius: 12px; }
+  html[data-size="large"] body { zoom: 1.15; }
+  html[data-size="xl"] body { zoom: 1.3; }
+  html[data-font="easy"] { --display: "Atkinson Hyperlegible", system-ui, sans-serif; --mono: "Atkinson Hyperlegible", system-ui, sans-serif; }
+  html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation: none !important; transition: none !important; }
   @media print {
     body { background: #fff; color: #000; }
     header.top, .foot, .skip, .sub, .controls, .res-actions, .run-head, textarea, .hint, .bests, #rvSetup, #dcSetup, #rvHistoryCard, #dcHistoryCard { display: none !important; }
@@ -307,6 +318,7 @@
       <button type="button" role="tab" id="tab-review" aria-controls="panel-review" data-tab="review" aria-selected="true" tabindex="0">Reviewer</button>
       <button type="button" role="tab" id="tab-dictation" aria-controls="panel-dictation" data-tab="dictation" aria-selected="false" tabindex="-1">Dictation</button>
       <button type="button" role="tab" id="tab-speed" aria-controls="panel-speed" data-tab="speed" aria-selected="false" tabindex="-1">Speed test</button>
+      <button type="button" role="tab" id="tab-progress" aria-controls="panel-progress" data-tab="progress" aria-selected="false" tabindex="-1">Progress</button>
     </div>
     <button type="button" class="restart" id="themeBtn">Dark mode</button>
   </header>
@@ -343,6 +355,7 @@
           <div class="opts">
             <div class="opt"><label for="rvFilter">Practise</label><select id="rvFilter"></select></div>
             <div class="opt"><label for="rvNum">Random sample questions per test (your own are always all included)</label><select id="rvNum"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="0">All of them</option></select></div>
+            <div class="opt"><label for="rvTime">Time limit</label><select id="rvTime"><option value="0">No limit</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option></select></div>
           </div>
           <div class="row">
             <button type="button" class="btn" id="rvStart">Start typing review</button>
@@ -386,13 +399,15 @@
           </div>
           <div class="row">
             <button type="button" class="btn" id="dcAdd">Add passage</button>
-            <button type="button" class="btn ghost" id="dcSample">Load sample passages</button>
+            
           </div>
+          <div class="field mt"><label for="dcSampleCat">Sample passages</label><div class="row"><select id="dcSampleCat" style="flex:1;min-width:180px"></select><button type="button" class="btn ghost" id="dcSample">Add samples</button></div></div>
           <p class="status" id="dcStatus" role="status"></p>
         </div>
 
         <div class="card panel">
           <h2>Passages <span class="count" id="dcCount"></span></h2>
+          <div class="row" style="margin-bottom:12px"><select id="dcFilter" style="flex:1;min-width:150px" aria-label="Passage category"></select><button type="button" class="btn small" id="dcRandom">Random passage</button></div>
           <ul class="deck" id="dcList"></ul>
           <div class="opts">
             <div class="opt"><label for="dcVoice">Voice</label><select id="dcVoice"><option value="">Default voice</option></select></div>
@@ -434,8 +449,17 @@
         <button type="button" data-dur="600" aria-pressed="false">10 minutes</button>
       </div>
       <label class="toggle"><input type="checkbox" id="punct" checked> Real sentences (turn off for random words)</label>
+      <button type="button" class="restart" id="weakBtn">Practise my weak keys</button>
+      <button type="button" class="restart" id="customBtn">Use my own text</button>
+      <label class="toggle" for="workSel">Work mode <select id="workSel" style="width:auto"><option value="">Off</option><option value="mail">Emails and chats</option><option value="data">Numbers and data entry</option></select></label>
     </div>
 
+    <p class="status" id="modeNote" role="status"></p>
+    <div class="card panel" id="customBox" style="margin-bottom:16px" hidden>
+      <div class="field"><label for="customText">Paste any text to practise with, such as notes, an email, or an article</label><textarea class="txt" id="customText" rows="5"></textarea></div>
+      <div class="row"><button type="button" class="btn" id="customGo">Start with this text</button></div>
+      <p class="status" id="customNote" role="status"></p>
+    </div>
     <div class="card" id="app">
       <div class="live">
         <div class="stat time"><div class="v" id="timeV">1:00</div><div class="l">Time left</div></div>
@@ -463,6 +487,7 @@
         <div class="res-actions">
           <button type="button" class="btn" id="againBtn">Try again</button>
           <button type="button" class="btn ghost" id="newBtn">New words</button>
+          <button type="button" class="btn ghost" id="cardBtn">Save result image</button>
         </div>
       </section>
     </div>
@@ -473,9 +498,46 @@
       <div class="card panel"><h2>Recent tests</h2><ul class="recent" id="recentList"></ul></div>
     </section>
   </section>
+
+  <section id="panel-progress" role="tabpanel" aria-labelledby="tab-progress" hidden>
+    <h1>Your progress.</h1>
+    <p class="sub">Every finished session is logged on this device. Set a daily goal and keep your streak going.</p>
+    <div class="two-col">
+      <div class="card panel">
+        <h2>Today</h2>
+        <div class="res-top">
+          <div class="medium"><div class="v" id="pgStreak">0</div><div class="l">Day streak</div></div>
+          <div class="medium"><div class="v" id="pgToday">0</div><div class="l">Minutes today</div></div>
+          <div class="medium"><div class="v" id="pgBest">0</div><div class="l">Best WPM</div></div>
+        </div>
+        <div class="tier-bar" aria-hidden="true" style="background:var(--line)"><i id="pgBar" style="width:0%"></i></div>
+        <p class="empty" id="pgGoalNote"></p>
+        <div class="opt" style="margin-top:14px"><label for="pgGoal" style="display:block;margin-bottom:6px">Daily goal</label><select id="pgGoal"><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option></select></div>
+      </div>
+      <div class="card panel">
+        <h2>Weak keys</h2>
+        <p class="empty" id="pgWeak" style="margin-bottom:16px"></p>
+        <button type="button" class="btn" id="pgDrill">Practise my weak keys</button>
+      </div>
+    </div>
+    <div class="card panel mt">
+      <h2>Recent sessions <span class="count" id="pgCount"></span></h2>
+      <svg class="chart" id="pgChart" viewBox="0 0 700 190" role="img" aria-label="Words per minute across your recent sessions"></svg>
+      <ul class="recent" id="pgList"></ul>
+    </div>
+  </section>
   </main>
   <footer class="foot">
     <p><b>Privacy:</b> Tempo runs entirely in your browser. Your questions, scores, and recordings stay on your device and are never uploaded. Clearing your browser data erases them.</p>
+    <details id="settings">
+      <summary>Accessibility settings</summary>
+      <div class="opts">
+        <div class="opt"><label for="setSize">Text size</label><select id="setSize"><option value="">Normal</option><option value="large">Large</option><option value="xl">Extra large</option></select></div>
+        <div class="opt"><label for="setFont">Font</label><select id="setFont"><option value="">Standard</option><option value="easy">Easy to read (Atkinson Hyperlegible)</option></select></div>
+        <label class="toggle"><input type="checkbox" id="setClick"> Key click sound</label>
+        <label class="toggle"><input type="checkbox" id="setMotion"> Reduce motion</label>
+      </div>
+    </details>
     <button type="button" class="restart" id="wipeBtn">Clear my saved data</button> <span id="wipeNote" role="status"></span>
   </footer>
 </div>
@@ -546,6 +608,24 @@
       a: aw.map(function (w, k) { return aOk[k] ? escHtml(w) : '<span class="dx-miss">' + escHtml(w) + "</span>"; }).join(" ")
     };
   }
+  var weak = (function () {
+    var K = "tempo-weak-v1", m = {};
+    try { m = JSON.parse(localStorage.getItem(K)) || {}; } catch (e) {}
+    return {
+      add: function (c) { c = String(c).toLowerCase(); if (/^[a-z]$/.test(c)) m[c] = (m[c] || 0) + 1; },
+      save: function () { try { localStorage.setItem(K, JSON.stringify(m)); } catch (e) {} },
+      top: function (n) { return Object.keys(m).sort(function (a, b) { return m[b] - m[a]; }).slice(0, n); }
+    };
+  })();
+  var log = (function () {
+    var K = "tempo-log-v1", rows = loadList(K).filter(function (r) { return r && r.d && typeof r.wpm === "number"; });
+    function day(t) { var x = new Date(t); return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0"); }
+    return {
+      add: function (mode, wpm, acc, secs) { rows.push({ d: day(Date.now()), mode: mode, wpm: wpm, acc: acc, secs: Math.round(secs) }); rows = rows.slice(-300); saveList(K, rows); },
+      rows: function () { return rows; },
+      day: day
+    };
+  })();
   var TIERS = [
     { min: 0, icon: "🐌", name: "Cozy Snail", line: "Slow and steady. Every fast typist started here." },
     { min: 20, icon: "🦔", name: "Curious Hedgehog", line: "You are warming up. Keep your eyes on the words." },
@@ -564,13 +644,34 @@
       '<div class="tier-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' +
       '<div class="tier-next">' + (nx ? (nx.min - wpm) + ' more WPM to become a ' + nx.name : 'Top tier reached') + '</div></div></div>';
   }
+  function tierFor(wpm) { var i = 0; TIERS.forEach(function (t, k) { if (wpm >= t.min) i = k; }); return TIERS[i]; }
+  function makeCard(wpm, acc, label, btn) {
+    var t = tierFor(wpm), c = document.createElement("canvas");
+    c.width = 1200; c.height = 630;
+    var g = c.getContext("2d"), grad = g.createLinearGradient(0, 0, 1200, 630);
+    grad.addColorStop(0, "#1b2f8f"); grad.addColorStop(1, "#2f5bff");
+    g.fillStyle = grad; g.fillRect(0, 0, 1200, 630);
+    g.fillStyle = "#ffffff";
+    g.font = "700 44px system-ui, sans-serif"; g.fillText("Tempo", 70, 100);
+    g.font = "500 30px system-ui, sans-serif"; g.fillText(label + " result", 70, 150);
+    g.font = "700 230px ui-monospace, Menlo, Consolas, monospace"; g.fillText(String(wpm), 70, 400);
+    g.font = "500 40px system-ui, sans-serif"; g.fillText("words per minute, " + acc + "% accuracy", 70, 470);
+    g.font = "700 44px system-ui, sans-serif"; g.fillText(t.name, 70, 560);
+    g.font = "250px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', system-ui, sans-serif"; g.fillText(t.icon, 840, 400);
+    var url = c.toDataURL("image/png"), host = btn.parentNode, old = host.parentNode.querySelector(".card-img");
+    if (old) old.remove();
+    var img = document.createElement("img");
+    img.className = "card-img"; img.src = url; img.alt = "Your Tempo result card: " + wpm + " words per minute, " + acc + " percent accuracy, " + t.name;
+    host.insertAdjacentElement("afterend", img);
+    var a = document.createElement("a"); a.href = url; a.download = "tempo-result.png"; a.click();
+  }
   var GRADE_LABEL = { correct: "Correct", close: "Almost there", wrong: "Not quite" };
 
   /* ================= session runner (type-the-answer flow) ================= */
   function Runner(root, cfg) {
     root.innerHTML =
       '<div class="run" hidden>' +
-        '<div class="run-head"><span class="run-count"></span><div class="run-bar"><i></i></div>' +
+        '<div class="run-head"><span class="run-count"></span><span class="run-time"></span><div class="run-bar"><i></i></div>' +
         '<button type="button" class="restart run-quit">End session</button></div>' +
         '<div class="run-prompt"></div>' +
         '<textarea class="answer" rows="3" placeholder="Type your answer" aria-label="Your answer" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea>' +
@@ -582,7 +683,7 @@
     var run = root.querySelector(".run"), sum = root.querySelector(".sum");
     var ta = run.querySelector("textarea"), fb = run.querySelector(".feedback"), hint = run.querySelector(".run-hint"), sr = run.querySelector(".sr-only");
     var items = [], idx = 0, results = [], phase = "answer", tFirst = 0, ins = 0, del = 0, submittedAt = 0, hintTimer = null;
-    var R = {}, fixedKeys = {};
+    var R = {}, fixedKeys = {}, clock = null;
 
     var HINT_ANSWER = (cfg.graded === false ? "Press <kbd>Enter</kbd> to save your answer and go to the next question." : "Press <kbd>Enter</kbd> to submit.") + " Pasting is turned off." + (cfg.tabHint ? " " + cfg.tabHint : "");
     function setHint(html, warn) { hint.innerHTML = html; hint.className = "run-hint" + (warn ? " warn" : ""); }
@@ -591,9 +692,27 @@
     R.start = function (list) {
       items = list; idx = 0; results = []; fixedKeys = {};
       root.hidden = false; sum.hidden = true; run.hidden = false;
+      clearInterval(clock);
+      var lim = cfg.timeLimit ? cfg.timeLimit() : 0, t0 = performance.now(), rt = run.querySelector(".run-time");
+      rt.textContent = "";
+      if (lim) {
+        clock = setInterval(function () {
+          var left = lim - (performance.now() - t0) / 1000, s = Math.max(0, Math.ceil(left));
+          rt.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0") + " left";
+          if (left <= 0) timeUp();
+        }, 250);
+      }
       step();
     };
+    function timeUp() {
+      clearInterval(clock);
+      if (phase === "answer" && ta.value.trim()) submit();
+      if (!sum.hidden) return;
+      if (!results.length) { R.exit(); return; }
+      finish();
+    }
     R.exit = function () {
+      clearInterval(clock);
       root.hidden = true; run.hidden = true; sum.hidden = true;
       if (cfg.onExit) cfg.onExit();
     };
@@ -697,16 +816,20 @@
         '<ul class="sum-list">' + rows + "</ul>" +
         '<div class="res-actions">' +
           '<button type="button" class="btn" data-act="again">Practise again</button>' +
+          '<button type="button" class="btn ghost" data-act="card">Save result image</button>' +
           '<button type="button" class="btn ghost" data-act="copy">Copy results (CSV)</button>' +
           '<button type="button" class="btn ghost" data-act="exit">Back to setup</button>' +
         "</div>";
+      weak.save(); log.add(cfg.logName, wpm, acc, secs);
       if (cfg.onComplete) cfg.onComplete({ wpm: wpm, acc: acc, words: words, count: results.length, when: Date.now() });
+      sum._card = { wpm: wpm, acc: acc };
       sum._missed = [];
       var firstBtn = sum.querySelector(".btn");
       if (firstBtn) firstBtn.focus();
     }
 
     function finish() {
+      clearInterval(clock);
       run.hidden = true; sum.hidden = false;
       if (cfg.onFinish) cfg.onFinish();
       if (cfg.graded === false) { finishUngraded(); return; }
@@ -718,6 +841,7 @@
       var pct = Math.round(pts / results.length * 100);
       var wpm = ms ? Math.round((chars / 5) / (ms / 60000)) : 0;
       var missed = results.filter(function (r) { return r.grade !== "correct"; }).map(function (r) { return r.item; });
+      weak.save(); log.add(cfg.logName, wpm, pct, ms / 1000);
       if (cfg.onComplete) cfg.onComplete({ wpm: wpm, acc: pct, count: results.length, when: Date.now() });
       var rows = results.map(function (r) {
         var label = cfg.label(r.item);
@@ -738,11 +862,13 @@
         '<div class="res-actions">' +
           (missed.length ? '<button type="button" class="btn" data-act="retry">Retry the ones I missed</button>' : "") +
           '<button type="button" class="btn' + (missed.length ? " ghost" : "") + '" data-act="again">Practise again</button>' +
+          '<button type="button" class="btn ghost" data-act="card">Save result image</button>' +
           '<button type="button" class="btn ghost" data-act="copy">Copy results (CSV)</button>' +
           '<button type="button" class="btn ghost" data-act="exit">Back to setup</button>' +
         "</div>";
       var first = sum.querySelector(".btn");
       if (first) first.focus();
+      sum._card = { wpm: wpm, acc: pct };
       sum._missed = missed;
     }
 
@@ -751,6 +877,7 @@
       if (!b) return;
       var act = b.getAttribute("data-act");
       if (act === "retry") R.start(sum._missed.slice());
+      else if (act === "card") makeCard(sum._card.wpm, sum._card.acc, cfg.logName, b);
       else if (act === "copy") copyCsv(b);
       else if (act === "again") R.start(cfg.rebuild());
       else R.exit();
@@ -762,7 +889,7 @@
       var t = e.inputType || "";
       if (t === "insertFromPaste" || t === "insertFromDrop" || t === "insertFromYank") { e.preventDefault(); flash(); return; }
       if (t.indexOf("insert") === 0) { if (!tFirst) tFirst = performance.now(); ins += e.data ? e.data.length : 1; }
-      else if (t.indexOf("delete") === 0) { del++; var gone = ta.value.slice(-1).toLowerCase(); if (/\S/.test(gone)) fixedKeys[gone] = (fixedKeys[gone] || 0) + 1; }
+      else if (t.indexOf("delete") === 0) { del++; var gone = ta.value.slice(-1).toLowerCase(); if (/\S/.test(gone)) { fixedKeys[gone] = (fixedKeys[gone] || 0) + 1; weak.add(gone); } }
     });
     function flash() {
       setHint("Pasting is off. Type your answer.", true);
@@ -1027,6 +1154,8 @@
     var runner = Runner($("rvRunner"), {
       noun: "Question",
       graded: false,
+      logName: "Reviewer",
+      timeLimit: function () { return parseInt($("rvTime").value, 10) * 60; },
       onComplete: function (s) { sessions.unshift(s); sessions = sessions.slice(0, 8); saveList(HKEY, sessions); renderHistory(); },
       renderPrompt: function (item, area) { area.innerHTML = '<div class="dict-meta" style="margin:0 0 6px">' + escHtml(item.cat || "") + '</div><div class="run-q">' + escHtml(item.q) + "</div>"; },
       label: function (item) { return item.q; },
@@ -1132,11 +1261,32 @@
   var dictation = (function () {
     var KEY = "tempo-dictation-v1";
     var passages = loadList(KEY).filter(function (p) { return p && p.text; });
-    var SAMPLE = [
-      "Please send the signed forms to the office by Friday afternoon. If you have any questions, call the front desk before noon.",
-      "Our meeting has moved to Room 204 and will start at half past three. Bring your laptop and a copy of the quarterly report.",
-      "The package was delivered to the wrong address. Please check the tracking number and contact the courier today."
-    ];
+    var SAMPLES = {
+      "Office": [
+        "Please send the signed forms to the office by Friday afternoon. If you have any questions, call the front desk before noon.",
+        "Our meeting has moved to Room 204 and will start at half past three. Bring your laptop and a copy of the quarterly report.",
+        "The printer on the second floor is out of paper. Please ask the supply desk for a new box before you start your report.",
+        "Thank you for joining the call today. I will send the notes and the next steps by the end of the day."
+      ],
+      "Customer service": [
+        "Good afternoon, and thank you for calling our store. May I have your name and your order number, please?",
+        "I am sorry about the delay with your delivery. I have checked the tracking and your parcel will arrive tomorrow morning.",
+        "Your refund has been approved and will reach your account within five working days. Is there anything else I can do for you?",
+        "Thank you for your patience while I checked this for you. The item is in stock and I can reserve it right now."
+      ],
+      "Travel": [
+        "The ferry to the island leaves at eight in the morning. Please arrive at the port at least one hour before departure.",
+        "Your flight has been moved to gate twelve. Boarding will begin in twenty minutes, so please keep your passport ready.",
+        "The hotel offers free breakfast from six to ten every day. Check out is at noon, but we can keep your bags until the evening.",
+        "Turn left at the next corner and walk past the old church. The museum is the tall white building on your right."
+      ],
+      "Technology": [
+        "Please restart your computer and try to sign in again. If the problem continues, send us a screenshot of the error.",
+        "Never share your password or your one time code with anyone. Our staff will never ask you for them by phone or message.",
+        "The update will install tonight and takes about ten minutes. Save your work and keep your device plugged in.",
+        "Backups protect your photos and files from loss. Set your phone to back up automatically whenever you are on Wi-Fi."
+      ]
+    };
     var status = $("dcStatus");
     var HKEY = "tempo-dictation-history-v1";
     var sessions = loadList(HKEY).filter(function (s) { return s && typeof s.wpm === "number"; });
@@ -1211,6 +1361,7 @@
 
     var runner = Runner($("dcRunner"), {
       noun: "Part",
+      logName: "Dictation",
       tabHint: "Press <kbd>Alt</kbd> + <kbd>R</kbd> (<kbd>Option</kbd> + <kbd>R</kbd> on Mac) to replay the audio.",
       strict: strictOn,
       renderPrompt: function (item, area) {
@@ -1250,14 +1401,19 @@
 
     /* setup */
     function persist() {
-      saveList(KEY, passages.filter(function (p) { return !p.audio; }).map(function (p) { return { text: p.text }; }));
+      saveList(KEY, passages.filter(function (p) { return !p.audio; }).map(function (p) { return { text: p.text, cat: p.cat }; }));
     }
     function render() {
+      var cats = [];
+      passages.forEach(function (p) { var c = p.cat || "My passages"; if (cats.indexOf(c) < 0) cats.push(c); });
+      var fv = $("dcFilter").value;
+      $("dcFilter").innerHTML = '<option value="">All categories</option>' + cats.map(function (c) { return "<option>" + escHtml(c) + "</option>"; }).join("");
+      $("dcFilter").value = cats.indexOf(fv) >= 0 ? fv : "";
       $("dcCount").textContent = passages.length ? passages.length + (passages.length === 1 ? " item" : " items") : "";
       $("dcList").innerHTML = passages.length
         ? passages.map(function (p, i) {
             var snip = p.text.length > 90 ? p.text.slice(0, 87) + "..." : p.text;
-            var kind = p.audio ? "Your recording (kept until you close this page)" : "Computer voice, " + splitSentences(p.text).length + " parts";
+            var kind = (p.cat || "My passages") + ". " + (p.audio ? "Your recording (kept until you close this page)" : "Computer voice, " + splitSentences(p.text).length + " parts");
             return '<li><div class="item-main"><div class="q">' + escHtml(snip) + '</div><div class="a">' + kind + "</div></div>" +
               '<div class="item-actions"><button type="button" class="btn small" data-act="go" data-i="' + i + '">Practise</button>' +
               '<button type="button" class="icon-btn" data-act="del" data-i="' + i + '" aria-label="Delete passage">&times;</button></div></li>';
@@ -1282,8 +1438,13 @@
       }
     });
     $("dcSample").addEventListener("click", function () {
-      SAMPLE.forEach(function (t) { if (!passages.some(function (p) { return p.text === t; })) passages.push({ text: t }); });
-      persist(); render(); status.textContent = "Sample passages added.";
+      var sel = $("dcSampleCat").value, added = 0;
+      Object.keys(SAMPLES).forEach(function (c) {
+        if (sel && sel !== c) return;
+        SAMPLES[c].forEach(function (t) { if (!passages.some(function (p) { return p.text === t; })) { passages.push({ text: t, cat: c }); added++; } });
+      });
+      persist(); render();
+      status.textContent = added ? added + " sample passages added" + (sel ? " to " + sel + "." : " from every category.") : "Those samples are already in your list.";
     });
 
     /* audio source */
@@ -1349,6 +1510,14 @@
       persist(); render(); status.textContent = "Passage added.";
     });
 
+    var dcCats = Object.keys(SAMPLES);
+    $("dcSampleCat").innerHTML = '<option value="">All categories</option>' + dcCats.map(function (c) { return "<option>" + c + "</option>"; }).join("");
+    $("dcRandom").addEventListener("click", function () {
+      var f = $("dcFilter").value, idx = [];
+      passages.forEach(function (p, i) { if (!f || (p.cat || "My passages") === f) idx.push(i); });
+      if (!idx.length) { status.textContent = "Add some passages first."; return; }
+      document.querySelector('#dcList [data-act=go][data-i="' + idx[Math.floor(Math.random() * idx.length)] + '"]').click();
+    });
     render();
     renderHistory();
     return { leave: function () { stopAudio(); }, focus: function () { if (!$("dcRunner").hidden) runner.focus(); } };
@@ -1473,17 +1642,53 @@
       "The orchestra tuned their instruments, the room fell silent, and the conductor lifted her arms to begin.",
       "At the end of the day, the best measure of progress is whether you are a little better than yesterday."
     ];
+    var WORK = {
+      mail: [
+        "Hi Maria, thank you for your email. I will send the updated report by 3 PM today.",
+        "Good morning, team. Please review the attached schedule and reply with any changes by Friday.",
+        "Dear Mr. Santos, we have received your request and will respond within two business days.",
+        "Hello, thanks for contacting support. Could you please share your order number so I can check?",
+        "Reminder: the meeting is at 10:30 AM in Room 204. Please bring your laptop and notes.",
+        "I am sorry for the delay. Your refund has been processed and should appear in 3 to 5 days.",
+        "Thanks for your patience! I have escalated this to our billing team and will update you soon.",
+        "Hi John, can we move our call to Tuesday at 2 PM? Let me know if that works for you.",
+        "Please find the invoice attached. Payment is due within 15 days of the date shown.",
+        "Great news: your application was approved. Our team will contact you with the next steps.",
+        "Hello! Your appointment is confirmed for March 14 at 9:00 AM. Reply YES to confirm.",
+        "Thank you for choosing our service. How can I help you today?",
+        "Noted, I will follow up with the supplier and send you a summary before the end of the day.",
+        "Hi all, the system will be down for maintenance tonight from 11 PM to 1 AM. Save your work."
+      ],
+      data: [
+        "Invoice #20481 | Date: 2026-03-14 | Amount: $1,250.75 | Status: PAID",
+        "Order ID: PH-77391 | Qty: 12 | Unit price: 45.50 | Total: 546.00",
+        "Name: Ana R. Dela Cruz | ID: 4823-1190-7765 | Dept: HR-02",
+        "SKU A-1042 x 24, SKU B-2207 x 6, SKU C-3318 x 150 (rush order)",
+        "Ref 889-204-117; Balance due: 3,480.90; Due date: 04/30/2026",
+        "Contact: +63 917 555 0142 | Email: orders@example.com | Ext. 204",
+        "Tracking: TRK0048291775 | Weight: 2.35 kg | Zone: 4 | Fee: $12.80",
+        "Account 00-5521-8830 | Deposit: 15,000.00 | Fee: 25.00 | Net: 14,975.00",
+        "Row 17: qty=48, price=9.99, tax=12%, total=537.09, note=fragile",
+        "Batch 2026-B07 | Lot 3321 | Temp 4.5C | Humidity 62% | Pass",
+        "Employee 10382 worked 8.5 hours on 03/11 and 7.75 hours on 03/12",
+        "Ticket T-5530 opened 09:42, assigned to Dev-3, priority HIGH, due 17:00",
+        "Total = (120 x 3) + (45 x 8) - 50 = 670",
+        "Zip 1100 | Lat 14.5995 | Lon 120.9842 | Elev 16 m"
+      ]
+    };
     var stage = $("stage"), wordsEl = $("words"), viewport = $("viewport"), input = $("input"), app = $("app");
     var S = {
-      dur: 60, punct: true, queue: [], bag: [], words: [], els: [], wi: 0, typed: "", entered: [],
+      dur: 60, punct: true, custom: null, work: null, ci: 0, drill: null, queue: [], bag: [], words: [], els: [], wi: 0, typed: "", entered: [],
       started: false, finished: false, t0: 0, keys: 0, good: 0, correctChars: 0, rawChars: 0,
       samples: [], lastSecond: 0, timer: null, cap: true
     };
     function rand(n) { return Math.floor(Math.random() * n); }
     function nextWord() {
-      if (S.punct) {
+      if (S.custom) { var cw = S.custom[S.ci % S.custom.length]; S.ci++; return cw; }
+      if (S.drill) return S.drill[rand(S.drill.length)];
+      if (S.punct || S.work) {
         if (!S.queue.length) {
-          if (!S.bag.length) S.bag = shuffle(SENTENCES.slice());
+          if (!S.bag.length) S.bag = shuffle((S.work || SENTENCES).slice());
           S.queue = S.bag.pop().split(" ");
         }
         return S.queue.shift();
@@ -1535,10 +1740,10 @@
     }
     function reset(newWords) {
       clearInterval(S.timer);
-      var keepWords = !newWords && S.words.length ? S.words.slice(0, 120) : null;
+      var keepWords = !newWords && !S.custom && S.words.length ? S.words.slice(0, 120) : null;
       S.words = []; S.els = []; S.wi = 0; S.typed = ""; S.entered = [];
       S.started = false; S.finished = false; S.keys = 0; S.good = 0;
-      S.correctChars = 0; S.rawChars = 0; S.samples = []; S.lastSecond = 0; S.cap = true; S.queue = []; S.bag = [];
+      S.correctChars = 0; S.rawChars = 0; S.samples = []; S.lastSecond = 0; S.cap = true; S.queue = []; S.bag = []; S.ci = 0;
       wordsEl.innerHTML = ""; wordsEl.style.transform = "translateY(0)";
       if (keepWords) {
         var frag = document.createDocumentFragment();
@@ -1607,6 +1812,7 @@
           S.keys++;
           var w = S.words[S.wi];
           if (S.typed.length < w.length && w[S.typed.length] === ch) S.good++;
+          else if (S.typed.length < w.length) weak.add(w[S.typed.length]);
           if (S.typed.length < w.length + 12) S.typed += ch;
         }
       }
@@ -1628,6 +1834,7 @@
       $("rWpm").textContent = wpm; $("rAcc").textContent = acc + "%"; $("rRaw").textContent = rawWpm; $("rChars").textContent = correct + "/" + raw;
       drawChart(S.samples);
       $("rTier").innerHTML = tierHtml(wpm);
+      S.last = { wpm: wpm, acc: acc };
       var badge = $("badge"), best = loadStore(), prevBest = best.bests[S.dur];
       if (wpm > 0 && (prevBest === undefined || wpm > prevBest)) {
         badge.textContent = prevBest === undefined ? "First score saved for this length" : "New personal best (previous: " + prevBest + " WPM)";
@@ -1639,6 +1846,7 @@
       best.recent.unshift({ wpm: wpm, acc: acc, dur: S.dur });
       best.recent = best.recent.slice(0, 6);
       saveStore(best); renderBests();
+      weak.save(); log.add("Speed test", wpm, acc, S.dur);
       app.classList.add("done");
       $("againBtn").focus();
     }
@@ -1709,17 +1917,82 @@
       Array.prototype.forEach.call($("durations").children, function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
       reset(false);
     });
-    $("punct").addEventListener("change", function (e) { S.punct = e.target.checked; reset(true); });
+    $("punct").addEventListener("change", function (e) { S.punct = e.target.checked; S.work = null; $("workSel").value = ""; S.custom = null; S.drill = null; $("modeNote").textContent = ""; reset(true); });
     $("restartBtn").addEventListener("click", function () { reset(true); });
     $("againBtn").addEventListener("click", function () { reset(false); });
     $("newBtn").addEventListener("click", function () { reset(true); });
     window.addEventListener("resize", scrollToCurrent);
+    function startDrill() {
+      var keys = weak.top(4);
+      if (!keys.length) { $("modeNote").textContent = "Finish a test or review first, so Tempo can learn which keys you miss."; return; }
+      S.custom = null; S.work = null; $("workSel").value = "";
+      S.drill = WORDS.filter(function (w) { return keys.some(function (k) { return w.indexOf(k) >= 0; }); });
+      $("modeNote").textContent = "Drill: words that use " + keys.map(function (k) { return k.toUpperCase(); }).join(", ") + ".";
+      reset(true);
+    }
+    $("weakBtn").addEventListener("click", startDrill);
+    $("workSel").addEventListener("change", function () {
+      S.work = WORK[this.value] || null; S.custom = null; S.drill = null;
+      $("modeNote").textContent = S.work ? "Work mode: " + this.options[this.selectedIndex].text + "." : "";
+      reset(true);
+    });
+    $("cardBtn").addEventListener("click", function () { if (S.last) makeCard(S.last.wpm, S.last.acc, "Speed test", this); });
+    $("customBtn").addEventListener("click", function () { $("customBox").hidden = !$("customBox").hidden; if (!$("customBox").hidden) $("customText").focus(); });
+    $("customGo").addEventListener("click", function () {
+      var ws = $("customText").value.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u2013\u2014]/g, "-").replace(/\u2026/g, "...").replace(/\s+/g, " ").trim().slice(0, 20000).split(" ").filter(Boolean);
+      if (ws.length < 5) { $("customNote").textContent = "Paste at least five words."; return; }
+      S.custom = ws; S.drill = null; S.work = null; $("workSel").value = "";
+      $("customNote").textContent = ""; $("customBox").hidden = true;
+      $("modeNote").textContent = "Using your own text: " + ws.length + " words.";
+      reset(true);
+    });
     renderBests();
     reset(true);
     return {
+      drill: startDrill,
       enter: function () { scrollToCurrent(); focusInput(); },
       leave: function () { if (S.started && !S.finished) reset(false); input.blur(); }
     };
+  })();
+
+  var progress = (function () {
+    var GK = "tempo-goal-v1";
+    function goal() { try { return parseInt(localStorage.getItem(GK), 10) || 10; } catch (e) { return 10; } }
+    function chart(d) {
+      var svg = $("pgChart");
+      if (d.length < 2) { svg.innerHTML = '<text class="axis" x="350" y="95" text-anchor="middle">Finish two sessions to see your trend</text>'; return; }
+      var W = 700, H = 190, pl = 34, pr = 10, pt = 10, pb = 26;
+      var mx = Math.max(10, Math.ceil(Math.max.apply(null, d.map(function (r) { return r.wpm; })) / 10) * 10);
+      var x = function (i) { return pl + i / (d.length - 1) * (W - pl - pr); }, y = function (v) { return pt + (1 - v / mx) * (H - pt - pb); };
+      var h = "";
+      for (var g = 0; g <= 4; g++) { var v = Math.round(mx * g / 4); h += '<line class="grid" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="axis" x="' + (pl - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + "</text>"; }
+      svg.innerHTML = h + '<polyline class="line" points="' + d.map(function (r, i) { return x(i).toFixed(1) + "," + y(r.wpm).toFixed(1); }).join(" ") + '"/>';
+    }
+    function render() {
+      var rows = log.rows(), today = log.day(Date.now()), g = goal();
+      var mins = Math.round(rows.filter(function (r) { return r.d === today; }).reduce(function (s, r) { return s + r.secs; }, 0) / 6) / 10;
+      var days = {}; rows.forEach(function (r) { days[r.d] = 1; });
+      var streak = 0, t = new Date();
+      if (!days[log.day(t)]) t.setDate(t.getDate() - 1);
+      while (days[log.day(t)]) { streak++; t.setDate(t.getDate() - 1); }
+      $("pgStreak").textContent = streak; $("pgToday").textContent = mins;
+      $("pgBest").textContent = rows.reduce(function (m, r) { return Math.max(m, r.wpm); }, 0);
+      $("pgBar").style.width = Math.min(100, Math.round(mins / g * 100)) + "%";
+      $("pgGoal").value = String(g);
+      $("pgGoalNote").textContent = mins >= g ? "Goal reached for today. Nice work." : (Math.round((g - mins) * 10) / 10) + " more minutes to reach your goal for today.";
+      var k = weak.top(5);
+      $("pgWeak").textContent = k.length ? "Keys you miss most: " + k.map(function (x) { return x.toUpperCase(); }).join(", ") + "." : "No data yet. Finish a test or a review and Tempo will learn which keys slow you down.";
+      $("pgDrill").disabled = !k.length;
+      $("pgCount").textContent = rows.length ? rows.length + (rows.length === 1 ? " session" : " sessions") : "";
+      chart(rows.slice(-14));
+      $("pgList").innerHTML = rows.length
+        ? rows.slice(-6).reverse().map(function (r) { return "<li><span>" + r.d + ", " + escHtml(r.mode) + ", " + r.acc + "% accuracy</span><b>" + r.wpm + " WPM</b></li>"; }).join("")
+        : '<li style="display:block;border:0;padding:0"><p class="empty">Finish a session and it will show up here.</p></li>';
+    }
+    $("pgGoal").addEventListener("change", function () { try { localStorage.setItem(GK, this.value); } catch (e) {} render(); });
+    $("pgDrill").addEventListener("click", function () { document.querySelector("[data-tab=speed]").click(); speed.drill(); });
+    render();
+    return { render: render };
   })();
 
   document.addEventListener("click", function (e) {
@@ -1728,6 +2001,32 @@
     t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop");
     t.addEventListener("animationend", function () { t.classList.remove("pop"); }, { once: true });
   });
+
+  var settings = (function () {
+    var K = "tempo-settings-v1", s = {}, ctx = null, root = document.documentElement;
+    try { s = JSON.parse(localStorage.getItem(K)) || {}; } catch (e) {}
+    function apply() {
+      ["size", "font"].forEach(function (k) { if (s[k]) root.setAttribute("data-" + k, s[k]); else root.removeAttribute("data-" + k); });
+      if (s.motion) root.setAttribute("data-motion", "off"); else root.removeAttribute("data-motion");
+      $("setSize").value = s.size || ""; $("setFont").value = s.font || ""; $("setClick").checked = !!s.click; $("setMotion").checked = !!s.motion;
+    }
+    function save() { try { localStorage.setItem(K, JSON.stringify(s)); } catch (e) {} }
+    [["setSize", "size"], ["setFont", "font"]].forEach(function (p) { $(p[0]).addEventListener("change", function () { s[p[1]] = this.value; save(); apply(); }); });
+    $("setClick").addEventListener("change", function () { s.click = this.checked; save(); });
+    $("setMotion").addEventListener("change", function () { s.motion = this.checked; save(); apply(); });
+    document.addEventListener("keydown", function (e) {
+      if (!s.click || e.key.length !== 1 || e.ctrlKey || e.metaKey) return;
+      var t = e.target;
+      if (!(t.id === "input" || (t.classList && t.classList.contains("answer")))) return;
+      try {
+        ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.frequency.value = 1800; g.gain.value = 0.04; o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.02);
+      } catch (er) {}
+    });
+    apply();
+  })();
 
   (function () {
     var b = $("wipeBtn"), armed = false, timer = null;
@@ -1773,9 +2072,10 @@
       c.setAttribute("aria-selected", c === b ? "true" : "false");
       c.setAttribute("tabindex", c === b ? "0" : "-1");
     });
-    ["review", "dictation", "speed"].forEach(function (t) { $("panel-" + t).hidden = t !== tab; });
+    ["review", "dictation", "speed", "progress"].forEach(function (t) { $("panel-" + t).hidden = t !== tab; });
     if (tab === "speed") speed.enter();
     else if (tab === "review") reviewer.focus();
+    else if (tab === "progress") progress.render();
     else dictation.focus();
   });
   $("tabs").addEventListener("keydown", function (e) {
@@ -1790,6 +2090,9 @@
     if (!n) return;
     e.preventDefault(); n.click(); n.focus();
   });
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
 })();
 </script>
 </body>
