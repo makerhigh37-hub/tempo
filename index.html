@@ -276,6 +276,8 @@
   @keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
   @keyframes pop { 0% { transform: scale(1) rotate(0); } 40% { transform: scale(1.35) rotate(-12deg); } 100% { transform: scale(1) rotate(0); } }
   @media (prefers-reduced-motion: reduce) { .tier-icon { animation: none !important; } }
+  .hdr-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .net { font-size: 13px; font-weight: 700; color: var(--ok); background: var(--ok-soft); padding: 6px 10px; border-radius: 999px; }
   .foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted-strong); font-size: 14px; line-height: 1.5; max-width: 70ch; }
   .foot p { margin: 0 0 12px; }
   .foot summary { padding: 13px 0; cursor: pointer; font-weight: 700; color: var(--ink); }
@@ -320,8 +322,13 @@
       <button type="button" role="tab" id="tab-speed" aria-controls="panel-speed" data-tab="speed" aria-selected="false" tabindex="-1">Speed test</button>
       <button type="button" role="tab" id="tab-progress" aria-controls="panel-progress" data-tab="progress" aria-selected="false" tabindex="-1">Progress</button>
     </div>
-    <button type="button" class="restart" id="themeBtn">Dark mode</button>
+    <div class="hdr-right">
+      <span class="net" id="netNote" role="status" hidden></span>
+      <button type="button" class="restart" id="installBtn">Install app</button>
+      <button type="button" class="restart" id="themeBtn">Dark mode</button>
+    </div>
   </header>
+  <p class="status" id="installHelp" role="status" style="margin-top:0"></p>
 
   <!-- ================= REVIEWER ================= -->
   <main id="main">
@@ -1349,6 +1356,7 @@
         var u = new SpeechSynthesisUtterance(current.answer);
         u.rate = parseFloat($("dcSpeed").value) || 1;
         var v = voiceByName($("dcVoice").value);
+        if (!navigator.onLine && (!v || !v.localService)) v = voices.filter(function (x) { return x.localService && /^en/i.test(x.lang); })[0] || voices.filter(function (x) { return x.localService; })[0] || v;
         if (v) { u.voice = v; u.lang = v.lang; }
         u.onend = u.onerror = function () { setPlaying(false); };
         setPlaying(true);
@@ -1392,7 +1400,7 @@
         return ae - be || a.name.localeCompare(b.name);
       });
       sel.innerHTML = '<option value="">Default voice</option>' + sorted.map(function (v) {
-        return '<option value="' + escHtml(v.name) + '">' + escHtml(v.name + " (" + v.lang + ")") + "</option>";
+        return '<option value="' + escHtml(v.name) + '">' + escHtml(v.name + " (" + v.lang + ")" + (v.localService ? "" : " - needs internet")) + "</option>";
       }).join("");
       sel.value = cur;
     }
@@ -2093,6 +2101,36 @@
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
   }
+
+  /* ================= install + offline status ================= */
+  var deferredPrompt = null, installBtn = $("installBtn"), help = $("installHelp");
+  var standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  installBtn.hidden = standalone;
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; });
+  window.addEventListener("appinstalled", function () { deferredPrompt = null; installBtn.hidden = true; help.textContent = "Tempo is installed. Open it from your Start menu, desktop, or home screen."; });
+  installBtn.addEventListener("click", function () {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      Promise.resolve(deferredPrompt.userChoice).then(function () { deferredPrompt = null; });
+      return;
+    }
+    var ua = navigator.userAgent;
+    if (!window.isSecureContext || !("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) help.textContent = "Installing works on the deployed https website, not on this preview or a local file.";
+    else if (/iPhone|iPad|iPod/.test(ua)) help.textContent = "On iPhone or iPad: tap the Share button, then Add to Home Screen.";
+    else if (/Firefox/.test(ua)) help.textContent = "Firefox on desktop cannot install web apps. Open Tempo in Chrome or Edge to install it.";
+    else if (/Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)) help.textContent = "In Safari on Mac: choose File, then Add to Dock.";
+    else help.textContent = "Use the install icon at the right end of the address bar, or the browser menu and choose Install Tempo. If you do not see it yet, use the site for a minute and try again.";
+  });
+  function netState() {
+    var n = $("netNote"), ready = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+    if (!navigator.onLine) { n.textContent = "Offline: everything still works"; n.hidden = false; }
+    else if (ready) { n.textContent = "Works offline"; n.hidden = false; }
+    else n.hidden = true;
+  }
+  window.addEventListener("online", netState);
+  window.addEventListener("offline", netState);
+  if (navigator.serviceWorker) navigator.serviceWorker.addEventListener("controllerchange", netState);
+  netState();
 })();
 </script>
 </body>
